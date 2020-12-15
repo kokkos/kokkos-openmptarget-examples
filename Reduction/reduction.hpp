@@ -142,6 +142,7 @@ struct Reduction {
     int64_t N_ = N;
     int64_t scalar_ = 0;
     team_policy policy(N_, nT);
+    view_t vector_ = vector;
 
     // warmup
     Kokkos::parallel_reduce(
@@ -159,6 +160,10 @@ struct Reduction {
         scalar_);
 
     scalar = 0;
+    for (int64_t i = 0; i < N_; ++i)
+      h_vector(i) = 0;
+    Kokkos::deep_copy(vector, h_vector);
+
     Kokkos::Timer timer;
 
     for (int r = 0; r < R; ++r) {
@@ -167,14 +172,13 @@ struct Reduction {
           "case-1", policy,
           KOKKOS_LAMBDA(const member_type &team, int64_t &team_update) {
             const int64_t i = team.league_rank();
-            int64_t thread_update = 0;
             Kokkos::parallel_reduce(
                 Kokkos::TeamThreadRange(team, N_),
                 [&](const int64_t j, int64_t &update) { update += i + 1; },
-                thread_update);
+                vector_(i));
 
             Kokkos::single(Kokkos::PerTeam(team),
-                           [&]() { team_update += thread_update; });
+                           [&]() { team_update += vector_(i); });
           },
           scalar_);
       scalar += scalar_;
@@ -189,9 +193,6 @@ struct Reduction {
     team_policy policy(N, Kokkos::AUTO);
 
     // warmup
-    for (int64_t i = 0; i < N_; ++i)
-      h_vector(i) = 0;
-
     Kokkos::parallel_for(
         "Vector_reduction", policy, KOKKOS_LAMBDA(const member_type &team) {
           const int64_t i = team.league_rank();
