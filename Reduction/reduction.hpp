@@ -2,7 +2,7 @@
 #include <cmath>
 #include <string.h>
 
-#define nT 64
+#define nT 32
 
 struct Reduction {
   using ExecSpace = Kokkos::DefaultExecutionSpace;
@@ -26,15 +26,15 @@ struct Reduction {
         omp_target_alloc(scratch_size, omp_get_default_device()));
   }
 
-  void correctness(int R) {
+  void correctness(char const *str, int R) {
     int64_t result = 0;
-    for (int i = 0; i < N; ++i)
+    for (int64_t i = 0; i < N; ++i)
       result += h_vector(i);
 
     int64_t check = R * (N * N * (N + 1)) / 2;
     if (scalar != check) {
-      printf("Scalar reduction failure. expected = %lu, result = %lu \n", check,
-             scalar);
+      printf("%s : Scalar reduction failure. expected = %lu, result = %lu \n",
+             str, check, scalar);
     }
 
     if (result != check) {
@@ -58,9 +58,9 @@ struct Reduction {
     Kokkos::Timer timer;
 
     for (int r = 0; r < R; ++r) {
-#pragma omp target teams distribute reduction(+ : scalar)
+#pragma omp target teams distribute reduction(+ : scalar) thread_limit(nT)
       for (int i = 0; i < N; ++i) {
-#pragma omp parallel for reduction(+ : scalar)
+#pragma omp parallel for reduction(+ : scalar) num_threads(nT)
         for (int j = 0; j < N; ++j) {
           scalar += i + 1;
         } // end j
@@ -134,14 +134,14 @@ struct Reduction {
     time = run_ompt_vector_redn(R);
     printf("OMPT: vector reduction = %f [secs]\n", time);
 
-    correctness(R);
+    correctness("OMPT", R);
   }
 
   double run_kk_scalar_redn(int R) {
 
     int64_t N_ = N;
     int64_t scalar_ = 0;
-    team_policy policy(N_, Kokkos::AUTO);
+    team_policy policy(N_, nT);
 
     // warmup
     Kokkos::parallel_reduce(
@@ -151,11 +151,10 @@ struct Reduction {
           int64_t thread_update = 0;
           Kokkos::parallel_reduce(
               Kokkos::TeamThreadRange(team, N_),
-              [&](const int j, int64_t &update) { update += i + 1; },
+              [&](const int64_t j, int64_t &update) { update += i + 1; },
               thread_update);
 
-          Kokkos::single(Kokkos::PerTeam(team),
-                         [&]() { team_update += thread_update; });
+          team_update += thread_update;
         },
         scalar_);
 
@@ -241,7 +240,7 @@ struct Reduction {
     time = run_kk_vector_redn(R);
     printf("KK: vector reduction = %f [secs]\n", time);
 
-    correctness(R);
+    correctness("KK", R);
   }
 
   void run_test(int R) {
