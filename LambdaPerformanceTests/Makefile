@@ -6,6 +6,16 @@ HEADERS = axpby.hpp dot.hpp
 default: build
 	echo "Start Build"
 
+ifneq (,$(findstring Cuda,$(KOKKOS_DEVICES)))
+CXX = ${KOKKOS_PATH}/bin/nvcc_wrapper
+CXXFLAGS = -O3
+LINK = ${CXX}
+LDFLAGS = 
+EXE = test.cuda
+KOKKOS_DEVICES = "Cuda"
+KOKKOS_ARCH = "Volta70"
+KOKKOS_CUDA_OPTIONS += "enable_lambda"
+else
 CXX = clang++
 CXXFLAGS = -O3
 LINK = ${CXX}
@@ -19,6 +29,7 @@ LINK = ${CXX}
 LDFLAGS =-Wno-unknown-cuda-version
 CXXFLAGS += $(LLVM_CFLAGS)
 LDFLAGS += $(LLVM_CFLAGS)
+endif
 
 
 DEPFLAGS = -M

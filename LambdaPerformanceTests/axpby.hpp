@@ -69,6 +69,7 @@ struct AXPBY {
         return time;
     }
 
+#if defined(KOKKOS_ENABLE_OPENMPTARGET)
     double native_openmp_axpby(int R) {
         double* x_ = x.data();
         double* y_ = y.data();
@@ -112,6 +113,7 @@ struct AXPBY {
         double time = timer.seconds();
         return time;
     }
+#endif
 
     void run_test(int R) {
         double bytes_moved = 1. * sizeof(double) * N * 3 * R;
@@ -121,6 +123,7 @@ struct AXPBY {
         double time_kk = kk_axpby(R);
         printf("AXPBY KK: %e s %e GB/s\n", time_kk, GB / time_kk);
 
+#if defined(KOKKOS_ENABLE_OPENMPTARGET)
         // AXPBY as LAMBDA inside OpenMP
         double time_lambda_openmp = lambda_openmp_axpby(R);
         printf("AXPBY lambda-openmp: %e s %e GB/s\n", time_lambda_openmp,
@@ -130,5 +133,6 @@ struct AXPBY {
         double time_native_openmp = native_openmp_axpby(R);
         printf("AXPBY native-openmp: %e s %e GB/s\n", time_native_openmp,
                GB / time_native_openmp);
+#endif
     }
 };

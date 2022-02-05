@@ -72,6 +72,7 @@ struct DOT {
         return time;
     }
 
+#if defined(KOKKOS_ENABLE_OPENMPTARGET)
     double native_openmp_dot(int R) {
         DOT f(*this);
         const auto y_ = y.data();
@@ -129,6 +130,7 @@ struct DOT {
         double time = timer.seconds();
         return time;
     }
+#endif
 
     void run_test(int R) {
         double bytes_moved = 1. * sizeof(double) * N * 2 * R;
@@ -138,6 +140,7 @@ struct DOT {
         double time_kk = kk_dot(R);
         printf("DOT KK: %e s %e GB/s\n", time_kk, GB / time_kk);
 
+#if defined(KOKKOS_ENABLE_OPENMPTARGET)
         // DOT as LAMBDA inside OpenMP
         double time_lambda_openmp = lambda_openmp_dot(R);
         printf("DOT lambda-openmp: %e s %e GB/s\n", time_lambda_openmp,
@@ -147,5 +150,6 @@ struct DOT {
         double time_native_openmp = native_openmp_dot(R);
         printf("DOT native-openmp: %e s %e GB/s\n", time_native_openmp,
                GB / time_native_openmp);
+#endif
     }
 };
