@@ -1,4 +1,4 @@
-KOKKOS_PATH = ${KOKKOS}/mainline-kokkos
+KOKKOS_PATH = ${KOKKOS}/rgayatri-kokkos
 SRC = $(wildcard *.cpp)
 vpath %.cpp $(sort $(dir $(SRC)))
 HEADERS = axpby.hpp dot.hpp
@@ -6,9 +6,9 @@ HEADERS = axpby.hpp dot.hpp
 default: build
 	echo "Start Build"
 
+CXXFLAGS = -O3
 ifneq (,$(findstring Cuda,$(KOKKOS_DEVICES)))
 CXX = ${KOKKOS_PATH}/bin/nvcc_wrapper
-CXXFLAGS = -O3
 LINK = ${CXX}
 LDFLAGS = 
 EXE = test.cuda
@@ -17,7 +17,6 @@ KOKKOS_ARCH = "Volta70"
 KOKKOS_CUDA_OPTIONS += "enable_lambda"
 else
 CXX = clang++
-CXXFLAGS = -O3
 LINK = ${CXX}
 EXE = test.ompt
 KOKKOS_DEVICES = "OpenMPTarget"
@@ -30,7 +29,6 @@ LDFLAGS =-Wno-unknown-cuda-version
 CXXFLAGS += $(LLVM_CFLAGS)
 LDFLAGS += $(LLVM_CFLAGS)
 endif
-
 
 DEPFLAGS = -M
 

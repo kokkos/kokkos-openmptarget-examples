@@ -43,9 +43,9 @@
 */
 
 #include <Kokkos_Core.hpp>
-#include <axpby.hpp>
 #include <cmath>
-#include <dot.hpp>
+#include "axpby.hpp"
+#include "dot.hpp"
 
 int main(int argc, char* argv[]) {
     Kokkos::initialize(argc, argv);
