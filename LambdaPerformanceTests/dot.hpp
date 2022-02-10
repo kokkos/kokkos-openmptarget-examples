@@ -91,7 +91,7 @@ struct DOT {
         {
             double result = 0.;
 #pragma omp target teams distribute parallel for is_device_ptr(x_, y_)\
-            reduction(+:result)
+            map(to:N) reduction(+:result)
             for (int i = 0; i < N; ++i) {
                 result += x_[i] * y_[i];
             }
@@ -101,7 +101,7 @@ struct DOT {
         for (int r = 0; r < R; r++) {
             double result = 0.;
 #pragma omp target teams distribute parallel for is_device_ptr(x_, y_) \
-            reduction(+:result)
+            map(to:N) reduction(+:result)
             for (int i = 0; i < N; ++i) {
                 result += x_[i] * y_[i];
             }
@@ -123,7 +123,7 @@ struct DOT {
         {
             double result = 0.;
 #pragma omp target teams distribute parallel for is_device_ptr(x_, y_) \
-      reduction(+:result)
+      map(to:dot_lambda,N) reduction(+:result)
             for (int i = 0; i < N; ++i) {
                 dot_lambda(i, result);
             }
@@ -133,7 +133,7 @@ struct DOT {
         Kokkos::Timer timer;
         for (int r = 0; r < R; r++) {
 #pragma omp target teams distribute parallel for is_device_ptr(x_, y_) \
-      map(to:dot_lambda) reduction(+:result)
+      map(to:dot_lambda,N) reduction(+:result)
             for (int i = 0; i < N; ++i) {
                 dot_lambda(i, result);
             }
