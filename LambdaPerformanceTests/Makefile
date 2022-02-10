@@ -1,4 +1,4 @@
-KOKKOS_PATH = ${KOKKOS}/rgayatri-kokkos
+KOKKOS_PATH = ${KOKKOS}/mainline-kokkos
 SRC = $(wildcard *.cpp)
 vpath %.cpp $(sort $(dir $(SRC)))
 HEADERS = axpby.hpp dot.hpp

@@ -47,7 +47,7 @@
 
 struct AXPBY {
     using view_t = Kokkos::View<double*>;
-    int N;
+    size_t N;
     view_t x, y, z;
 
     AXPBY(int N_)
@@ -63,8 +63,9 @@ struct AXPBY {
 
         Kokkos::Timer timer;
         for (int r = 0; r < R; r++) {
-            Kokkos::parallel_for("kk_axpby", N, *this);
+            Kokkos::parallel_for("kk_axpby", Kokkos::RangePolicy<Kokkos::IndexType<int>>(0,N), *this);
         }
+        Kokkos::fence();
         double time = timer.seconds();
         return time;
     }
@@ -97,7 +98,7 @@ struct AXPBY {
         double* y_ = y.data();
         double* z_ = z.data();
 
-        auto axpby_lambda = [=](int i) { z_[i] = x_[i] + y_[i]; };
+        auto axpby_lambda = [=](size_t i) { z_[i] = x_[i] + y_[i]; };
 
         // Warmup
 #pragma omp target teams distribute parallel for map(to : axpby_lambda)
@@ -106,9 +107,10 @@ struct AXPBY {
         }
 
         Kokkos::Timer timer;
+
         for (int r = 0; r < R; r++) {
 #pragma omp target teams distribute parallel for map(to : axpby_lambda)
-            for (int i = 0; i < N; ++i) axpby_lambda(i);
+            for (size_t i = 0; i < N; ++i) axpby_lambda(i);
         }
         double time = timer.seconds();
         return time;
@@ -121,17 +123,17 @@ struct AXPBY {
 
         // AXPBY as Kokkos kernels
         double time_kk = kk_axpby(R);
-        printf("AXPBY KK: %e s %e GB/s\n", time_kk, GB / time_kk);
+        printf("AXPBY KK: %e s %e GiB/s\n", time_kk, GB / time_kk);
 
 #if defined(KOKKOS_ENABLE_OPENMPTARGET)
         // AXPBY as LAMBDA inside OpenMP
         double time_lambda_openmp = lambda_openmp_axpby(R);
-        printf("AXPBY lambda-openmp: %e s %e GB/s\n", time_lambda_openmp,
+        printf("AXPBY lambda-openmp: %e s %e GiB/s\n", time_lambda_openmp,
                GB / time_lambda_openmp);
 
         // AXPBY as native OpenMP
         double time_native_openmp = native_openmp_axpby(R);
-        printf("AXPBY native-openmp: %e s %e GB/s\n", time_native_openmp,
+        printf("AXPBY native-openmp: %e s %e GiB/s\n", time_native_openmp,
                GB / time_native_openmp);
 #endif
     }

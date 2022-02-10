@@ -43,6 +43,7 @@
 */
 
 #include <Kokkos_Core.hpp>
+#include <Kokkos_Random.hpp>
 #include <cmath>
 
 struct DOT {
@@ -52,7 +53,15 @@ struct DOT {
 
     bool fence_all;
     DOT(int N_, bool fence_all_)
-        : N(N_), x(view_t("X", N)), y(view_t("Y", N)), fence_all(fence_all_) {}
+        : N(N_), x(view_t("X", N)), y(view_t("Y", N)), fence_all(fence_all_) {
+        Kokkos::deep_copy(x, 1);
+        Kokkos::deep_copy(y, 2);
+
+        // Filling with random digits fails at runtime for the N=33554432
+        // Kokkos::Random_XorShift64_Pool<> rand_pool64(5374857);
+        // Kokkos::fill_random(x,rand_pool64,100);
+        // Kokkos::fill_random(y,rand_pool64,100);
+    }
 
     KOKKOS_FUNCTION
     void operator()(int i, double& lsum) const { lsum += x(i) * y(i); }
@@ -81,7 +90,8 @@ struct DOT {
         // Warmup
         {
             double result = 0.;
-#pragma omp target teams distribute parallel for is_device_ptr(x_, y_)
+#pragma omp target teams distribute parallel for is_device_ptr(x_, y_)\
+            reduction(+:result)
             for (int i = 0; i < N; ++i) {
                 result += x_[i] * y_[i];
             }
@@ -90,7 +100,8 @@ struct DOT {
         Kokkos::Timer timer;
         for (int r = 0; r < R; r++) {
             double result = 0.;
-#pragma omp target teams distribute parallel for is_device_ptr(x_, y_)
+#pragma omp target teams distribute parallel for is_device_ptr(x_, y_) \
+            reduction(+:result)
             for (int i = 0; i < N; ++i) {
                 result += x_[i] * y_[i];
             }
@@ -104,7 +115,7 @@ struct DOT {
         const auto y_ = y.data();
         const auto x_ = x.data();
 
-        auto dot_lambda = [=](int i, double result) {
+        auto dot_lambda = [=](int i, double& result) {
             result += x_[i] * y_[i];
         };
 
@@ -112,22 +123,24 @@ struct DOT {
         {
             double result = 0.;
 #pragma omp target teams distribute parallel for is_device_ptr(x_, y_) \
-      reductions(+:result);
+      reduction(+:result);
             for (int i = 0; i < N; ++i) {
                 dot_lambda(i, result);
             }
         }
 
+        double result = 0.;
         Kokkos::Timer timer;
         for (int r = 0; r < R; r++) {
-            double result = 0.;
 #pragma omp target teams distribute parallel for is_device_ptr(x_, y_) \
-      reductions(+:result);
+      map(to:dot_lambda) reduction(+:result);
             for (int i = 0; i < N; ++i) {
                 dot_lambda(i, result);
             }
         }
         double time = timer.seconds();
+        result = 0;
+
         return time;
     }
 #endif
@@ -138,17 +151,17 @@ struct DOT {
 
         // DOT as Kokkos kernels
         double time_kk = kk_dot(R);
-        printf("DOT KK: %e s %e GB/s\n", time_kk, GB / time_kk);
+        printf("DOT KK: %e s %e GiB/s\n", time_kk, GB / time_kk);
 
 #if defined(KOKKOS_ENABLE_OPENMPTARGET)
         // DOT as LAMBDA inside OpenMP
         double time_lambda_openmp = lambda_openmp_dot(R);
-        printf("DOT lambda-openmp: %e s %e GB/s\n", time_lambda_openmp,
+        printf("DOT lambda-openmp: %e s %e GiB/s\n", time_lambda_openmp,
                GB / time_lambda_openmp);
 
         // DOT as native OpenMP
         double time_native_openmp = native_openmp_dot(R);
-        printf("DOT native-openmp: %e s %e GB/s\n", time_native_openmp,
+        printf("DOT native-openmp: %e s %e GiB/s\n", time_native_openmp,
                GB / time_native_openmp);
 #endif
     }
