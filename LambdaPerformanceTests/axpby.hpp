@@ -51,7 +51,10 @@ struct AXPBY {
     view_t x, y, z;
 
     AXPBY(int N_)
-        : N(N_), x(view_t("X", N)), y(view_t("Y", N)), z(view_t("Z", N)) {}
+        : N(N_), x(view_t("X", N)), y(view_t("Y", N)), z(view_t("Z", N)) {
+        Kokkos::deep_copy(x, 1);
+        Kokkos::deep_copy(y, 2);
+    }
 
     KOKKOS_FUNCTION
     void operator()(int i) const { z(i) = x(i) + y(i); }
@@ -63,9 +66,12 @@ struct AXPBY {
 
         Kokkos::Timer timer;
         for (int r = 0; r < R; r++) {
-            Kokkos::parallel_for("kk_axpby", Kokkos::RangePolicy<Kokkos::IndexType<int>>(0,N), *this);
+            Kokkos::parallel_for(
+                "kk_axpby", Kokkos::RangePolicy<Kokkos::IndexType<int>>(0, N),
+                *this);
         }
         Kokkos::fence();
+        auto h_z = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace(), z);
         double time = timer.seconds();
         return time;
     }
@@ -122,6 +128,7 @@ struct AXPBY {
         double GB = bytes_moved / 1024 / 1024 / 1024;
 
         // AXPBY as Kokkos kernels
+        printf("am here \n");
         double time_kk = kk_axpby(R);
         printf("AXPBY KK: %e s %e GiB/s\n", time_kk, GB / time_kk);
 
