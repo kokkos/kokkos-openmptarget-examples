@@ -1,0 +1,857 @@
+clang++ -I./ -I/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src -I/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/containers/src -I/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/algorithms/src -std=c++17 -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70 -DKOKKOS_WORKAROUND_OPENMPTARGET_CLANG -fopenmp -fopenmp=libomp --cuda-path=/usr/common/software/sles15_cgpu/cuda/11.2.1 -I./ -I/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src -I/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/containers/src -I/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/algorithms/src -O3  -c main.cpp -o main.o
+In file included from main.cpp:1:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Core.hpp:53:
+In file included from ./KokkosCore_Config_DeclareBackend.hpp:50:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/decl/Kokkos_Declare_OPENMPTARGET.hpp:49:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_OpenMPTarget.hpp:167:
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:92:59: warning: Type 'Kokkos::Impl::ViewFill<Kokkos::View<unsigned int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>' is not trivially copyable and not guaranteed to be mapped correctly [-Wopenmp-mapping]
+#pragma omp target teams distribute parallel for map(to : a_functor)
+                                                          ^~~~~~~~~
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:77:26: note: in instantiation of function template specialization 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewFill<Kokkos::View<unsigned int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Experimental::OpenMPTarget>::execute_impl<void>' requested here
+  void execute() const { execute_impl<WorkTag>(); }
+                         ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:168:11: note: in instantiation of member function 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewFill<Kokkos::View<unsigned int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Experimental::OpenMPTarget>::execute' requested here
+  closure.execute();
+          ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:199:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Impl::ViewFill<Kokkos::View<unsigned int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>>' requested here
+  ::Kokkos::parallel_for(policy, functor, str);
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:96:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Impl::ViewFill<Kokkos::View<unsigned int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>>' requested here
+    Kokkos::parallel_for("Kokkos::ViewFill-1D",
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:1271:5: note: in instantiation of member function 'Kokkos::Impl::ViewFill<Kokkos::View<unsigned int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>::ViewFill' requested here
+    Kokkos::Impl::ViewFill<ViewTypeFlat, Kokkos::LayoutRight, ExecutionSpace,
+    ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:1284:5: note: (skipping 1 context in backtrace; use -ftemplate-backtrace-limit=0 to see all)
+    contiguous_fill(exec_space, dst, value);
+    ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3041:13: note: in instantiation of member function 'Kokkos::Impl::ZeroMemset<Kokkos::Experimental::OpenMPTarget, unsigned int *, Kokkos::Experimental::OpenMPTargetSpace, Kokkos::MemoryTraits<1>>::ZeroMemset' requested here
+      (void)ZeroMemset<ExecSpace, ValueType*, typename DeviceType::memory_space,
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3436:25: note: in instantiation of function template specialization 'Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, unsigned int, true>::construct_shared_allocation<unsigned int>' requested here
+      record->m_destroy.construct_shared_allocation();
+                        ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_View.hpp:1462:60: note: in instantiation of function template specialization 'Kokkos::Impl::ViewMapping<Kokkos::ViewTraits<unsigned int *, Kokkos::Experimental::OpenMPTargetSpace>, void>::allocate_shared<std::basic_string<char>, std::integral_constant<unsigned int, 0>, Kokkos::Experimental::OpenMPTargetSpace, Kokkos::Experimental::OpenMPTarget>' requested here
+    Kokkos::Impl::SharedAllocationRecord<>* record = m_map.allocate_shared(
+                                                           ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_View.hpp:1582:9: note: in instantiation of function template specialization 'Kokkos::View<unsigned int *, Kokkos::Experimental::OpenMPTargetSpace>::View<std::basic_string<char>>' requested here
+      : View(Impl::ViewCtorProp<std::string>(arg_label),
+        ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_UniqueToken.hpp:123:9: note: in instantiation of function template specialization 'Kokkos::View<unsigned int *, Kokkos::Experimental::OpenMPTargetSpace>::View<char[35]>' requested here
+      : m_buffer_view(
+        ^
+In file included from main.cpp:1:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Core.hpp:53:
+In file included from ./KokkosCore_Config_DeclareBackend.hpp:50:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/decl/Kokkos_Declare_OPENMPTARGET.hpp:49:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_OpenMPTarget.hpp:167:
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:92:59: warning: Type 'Kokkos::Impl::ViewFill<Kokkos::View<unsigned int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1>' is not trivially copyable and not guaranteed to be mapped correctly [-Wopenmp-mapping]
+#pragma omp target teams distribute parallel for map(to : a_functor)
+                                                          ^~~~~~~~~
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:77:26: note: in instantiation of function template specialization 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewFill<Kokkos::View<unsigned int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Experimental::OpenMPTarget>::execute_impl<void>' requested here
+  void execute() const { execute_impl<WorkTag>(); }
+                         ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:168:11: note: in instantiation of member function 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewFill<Kokkos::View<unsigned int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Experimental::OpenMPTarget>::execute' requested here
+  closure.execute();
+          ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:199:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Impl::ViewFill<Kokkos::View<unsigned int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1>>' requested here
+  ::Kokkos::parallel_for(policy, functor, str);
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:96:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Impl::ViewFill<Kokkos::View<unsigned int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1>>' requested here
+    Kokkos::parallel_for("Kokkos::ViewFill-1D",
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:1275:5: note: in instantiation of member function 'Kokkos::Impl::ViewFill<Kokkos::View<unsigned int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1>::ViewFill' requested here
+    Kokkos::Impl::ViewFill<ViewTypeFlat, Kokkos::LayoutRight, ExecutionSpace,
+    ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:1284:5: note: (skipping 1 context in backtrace; use -ftemplate-backtrace-limit=0 to see all)
+    contiguous_fill(exec_space, dst, value);
+    ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3041:13: note: in instantiation of member function 'Kokkos::Impl::ZeroMemset<Kokkos::Experimental::OpenMPTarget, unsigned int *, Kokkos::Experimental::OpenMPTargetSpace, Kokkos::MemoryTraits<1>>::ZeroMemset' requested here
+      (void)ZeroMemset<ExecSpace, ValueType*, typename DeviceType::memory_space,
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3436:25: note: in instantiation of function template specialization 'Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, unsigned int, true>::construct_shared_allocation<unsigned int>' requested here
+      record->m_destroy.construct_shared_allocation();
+                        ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_View.hpp:1462:60: note: in instantiation of function template specialization 'Kokkos::Impl::ViewMapping<Kokkos::ViewTraits<unsigned int *, Kokkos::Experimental::OpenMPTargetSpace>, void>::allocate_shared<std::basic_string<char>, std::integral_constant<unsigned int, 0>, Kokkos::Experimental::OpenMPTargetSpace, Kokkos::Experimental::OpenMPTarget>' requested here
+    Kokkos::Impl::SharedAllocationRecord<>* record = m_map.allocate_shared(
+                                                           ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_View.hpp:1582:9: note: in instantiation of function template specialization 'Kokkos::View<unsigned int *, Kokkos::Experimental::OpenMPTargetSpace>::View<std::basic_string<char>>' requested here
+      : View(Impl::ViewCtorProp<std::string>(arg_label),
+        ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_UniqueToken.hpp:123:9: note: in instantiation of function template specialization 'Kokkos::View<unsigned int *, Kokkos::Experimental::OpenMPTargetSpace>::View<char[35]>' requested here
+      : m_buffer_view(
+        ^
+In file included from main.cpp:1:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Core.hpp:53:
+In file included from ./KokkosCore_Config_DeclareBackend.hpp:50:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/decl/Kokkos_Declare_OPENMPTARGET.hpp:49:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_OpenMPTarget.hpp:167:
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:92:59: warning: Type 'Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, unsigned int, true>' is not trivially copyable and not guaranteed to be mapped correctly [-Wopenmp-mapping]
+#pragma omp target teams distribute parallel for map(to : a_functor)
+                                                          ^~~~~~~~~
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:77:26: note: in instantiation of function template specialization 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, unsigned int, true>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Experimental::OpenMPTarget>::execute_impl<void>' requested here
+  void execute() const { execute_impl<WorkTag>(); }
+                         ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3086:15: note: in instantiation of member function 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, unsigned int, true>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Experimental::OpenMPTarget>::execute' requested here
+      closure.execute();
+              ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3055:7: note: in instantiation of member function 'Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, unsigned int, true>::parallel_for_implementation' requested here
+      parallel_for_implementation();
+      ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3436:25: note: in instantiation of function template specialization 'Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, unsigned int, true>::construct_shared_allocation<unsigned int>' requested here
+      record->m_destroy.construct_shared_allocation();
+                        ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_View.hpp:1462:60: note: in instantiation of function template specialization 'Kokkos::Impl::ViewMapping<Kokkos::ViewTraits<unsigned int *, Kokkos::Experimental::OpenMPTargetSpace>, void>::allocate_shared<std::basic_string<char>, std::integral_constant<unsigned int, 0>, Kokkos::Experimental::OpenMPTargetSpace, Kokkos::Experimental::OpenMPTarget>' requested here
+    Kokkos::Impl::SharedAllocationRecord<>* record = m_map.allocate_shared(
+                                                           ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_View.hpp:1582:9: note: in instantiation of function template specialization 'Kokkos::View<unsigned int *, Kokkos::Experimental::OpenMPTargetSpace>::View<std::basic_string<char>>' requested here
+      : View(Impl::ViewCtorProp<std::string>(arg_label),
+        ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_UniqueToken.hpp:123:9: note: in instantiation of function template specialization 'Kokkos::View<unsigned int *, Kokkos::Experimental::OpenMPTargetSpace>::View<char[35]>' requested here
+      : m_buffer_view(
+        ^
+In file included from main.cpp:1:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Core.hpp:53:
+In file included from ./KokkosCore_Config_DeclareBackend.hpp:50:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/decl/Kokkos_Declare_OPENMPTARGET.hpp:49:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_OpenMPTarget.hpp:167:
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:92:59: warning: Type 'Kokkos::Impl::ViewFill<Kokkos::View<int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>' is not trivially copyable and not guaranteed to be mapped correctly [-Wopenmp-mapping]
+#pragma omp target teams distribute parallel for map(to : a_functor)
+                                                          ^~~~~~~~~
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:77:26: note: in instantiation of function template specialization 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewFill<Kokkos::View<int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Experimental::OpenMPTarget>::execute_impl<void>' requested here
+  void execute() const { execute_impl<WorkTag>(); }
+                         ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:168:11: note: in instantiation of member function 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewFill<Kokkos::View<int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Experimental::OpenMPTarget>::execute' requested here
+  closure.execute();
+          ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:199:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Impl::ViewFill<Kokkos::View<int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>>' requested here
+  ::Kokkos::parallel_for(policy, functor, str);
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:96:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Impl::ViewFill<Kokkos::View<int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>>' requested here
+    Kokkos::parallel_for("Kokkos::ViewFill-1D",
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:1271:5: note: in instantiation of member function 'Kokkos::Impl::ViewFill<Kokkos::View<int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>::ViewFill' requested here
+    Kokkos::Impl::ViewFill<ViewTypeFlat, Kokkos::LayoutRight, ExecutionSpace,
+    ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:1284:5: note: (skipping 1 context in backtrace; use -ftemplate-backtrace-limit=0 to see all)
+    contiguous_fill(exec_space, dst, value);
+    ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3041:13: note: in instantiation of member function 'Kokkos::Impl::ZeroMemset<Kokkos::Experimental::OpenMPTarget, int *, Kokkos::Experimental::OpenMPTargetSpace, Kokkos::MemoryTraits<1>>::ZeroMemset' requested here
+      (void)ZeroMemset<ExecSpace, ValueType*, typename DeviceType::memory_space,
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3436:25: note: in instantiation of function template specialization 'Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, int, true>::construct_shared_allocation<int>' requested here
+      record->m_destroy.construct_shared_allocation();
+                        ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_View.hpp:1462:60: note: in instantiation of function template specialization 'Kokkos::Impl::ViewMapping<Kokkos::ViewTraits<int[2], Kokkos::Experimental::OpenMPTarget>, void>::allocate_shared<std::basic_string<char>, std::integral_constant<unsigned int, 0>, Kokkos::Experimental::OpenMPTargetSpace, Kokkos::Experimental::OpenMPTarget>' requested here
+    Kokkos::Impl::SharedAllocationRecord<>* record = m_map.allocate_shared(
+                                                           ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_View.hpp:1582:9: note: in instantiation of function template specialization 'Kokkos::View<int[2], Kokkos::Experimental::OpenMPTarget>::View<std::basic_string<char>>' requested here
+      : View(Impl::ViewCtorProp<std::string>(arg_label),
+        ^
+main.cpp:18:41: note: in instantiation of function template specialization 'Kokkos::View<int[2], Kokkos::Experimental::OpenMPTarget>::View<char[2]>' requested here
+        Kokkos::View<int[2], ExecSpace> v("v");
+                                        ^
+In file included from main.cpp:1:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Core.hpp:53:
+In file included from ./KokkosCore_Config_DeclareBackend.hpp:50:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/decl/Kokkos_Declare_OPENMPTARGET.hpp:49:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_OpenMPTarget.hpp:167:
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:92:59: warning: Type 'Kokkos::Impl::ViewFill<Kokkos::View<int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1>' is not trivially copyable and not guaranteed to be mapped correctly [-Wopenmp-mapping]
+#pragma omp target teams distribute parallel for map(to : a_functor)
+                                                          ^~~~~~~~~
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:77:26: note: in instantiation of function template specialization 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewFill<Kokkos::View<int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Experimental::OpenMPTarget>::execute_impl<void>' requested here
+  void execute() const { execute_impl<WorkTag>(); }
+                         ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:168:11: note: in instantiation of member function 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewFill<Kokkos::View<int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Experimental::OpenMPTarget>::execute' requested here
+  closure.execute();
+          ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:199:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Impl::ViewFill<Kokkos::View<int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1>>' requested here
+  ::Kokkos::parallel_for(policy, functor, str);
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:96:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Impl::ViewFill<Kokkos::View<int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1>>' requested here
+    Kokkos::parallel_for("Kokkos::ViewFill-1D",
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:1275:5: note: in instantiation of member function 'Kokkos::Impl::ViewFill<Kokkos::View<int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1>::ViewFill' requested here
+    Kokkos::Impl::ViewFill<ViewTypeFlat, Kokkos::LayoutRight, ExecutionSpace,
+    ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:1284:5: note: (skipping 1 context in backtrace; use -ftemplate-backtrace-limit=0 to see all)
+    contiguous_fill(exec_space, dst, value);
+    ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3041:13: note: in instantiation of member function 'Kokkos::Impl::ZeroMemset<Kokkos::Experimental::OpenMPTarget, int *, Kokkos::Experimental::OpenMPTargetSpace, Kokkos::MemoryTraits<1>>::ZeroMemset' requested here
+      (void)ZeroMemset<ExecSpace, ValueType*, typename DeviceType::memory_space,
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3436:25: note: in instantiation of function template specialization 'Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, int, true>::construct_shared_allocation<int>' requested here
+      record->m_destroy.construct_shared_allocation();
+                        ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_View.hpp:1462:60: note: in instantiation of function template specialization 'Kokkos::Impl::ViewMapping<Kokkos::ViewTraits<int[2], Kokkos::Experimental::OpenMPTarget>, void>::allocate_shared<std::basic_string<char>, std::integral_constant<unsigned int, 0>, Kokkos::Experimental::OpenMPTargetSpace, Kokkos::Experimental::OpenMPTarget>' requested here
+    Kokkos::Impl::SharedAllocationRecord<>* record = m_map.allocate_shared(
+                                                           ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_View.hpp:1582:9: note: in instantiation of function template specialization 'Kokkos::View<int[2], Kokkos::Experimental::OpenMPTarget>::View<std::basic_string<char>>' requested here
+      : View(Impl::ViewCtorProp<std::string>(arg_label),
+        ^
+main.cpp:18:41: note: in instantiation of function template specialization 'Kokkos::View<int[2], Kokkos::Experimental::OpenMPTarget>::View<char[2]>' requested here
+        Kokkos::View<int[2], ExecSpace> v("v");
+                                        ^
+In file included from main.cpp:1:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Core.hpp:53:
+In file included from ./KokkosCore_Config_DeclareBackend.hpp:50:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/decl/Kokkos_Declare_OPENMPTARGET.hpp:49:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_OpenMPTarget.hpp:167:
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:92:59: warning: Type 'Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, int, true>' is not trivially copyable and not guaranteed to be mapped correctly [-Wopenmp-mapping]
+#pragma omp target teams distribute parallel for map(to : a_functor)
+                                                          ^~~~~~~~~
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:77:26: note: in instantiation of function template specialization 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, int, true>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Experimental::OpenMPTarget>::execute_impl<void>' requested here
+  void execute() const { execute_impl<WorkTag>(); }
+                         ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3086:15: note: in instantiation of member function 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, int, true>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Experimental::OpenMPTarget>::execute' requested here
+      closure.execute();
+              ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3055:7: note: in instantiation of member function 'Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, int, true>::parallel_for_implementation' requested here
+      parallel_for_implementation();
+      ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3436:25: note: in instantiation of function template specialization 'Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, int, true>::construct_shared_allocation<int>' requested here
+      record->m_destroy.construct_shared_allocation();
+                        ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_View.hpp:1462:60: note: in instantiation of function template specialization 'Kokkos::Impl::ViewMapping<Kokkos::ViewTraits<int[2], Kokkos::Experimental::OpenMPTarget>, void>::allocate_shared<std::basic_string<char>, std::integral_constant<unsigned int, 0>, Kokkos::Experimental::OpenMPTargetSpace, Kokkos::Experimental::OpenMPTarget>' requested here
+    Kokkos::Impl::SharedAllocationRecord<>* record = m_map.allocate_shared(
+                                                           ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_View.hpp:1582:9: note: in instantiation of function template specialization 'Kokkos::View<int[2], Kokkos::Experimental::OpenMPTarget>::View<std::basic_string<char>>' requested here
+      : View(Impl::ViewCtorProp<std::string>(arg_label),
+        ^
+main.cpp:18:41: note: in instantiation of function template specialization 'Kokkos::View<int[2], Kokkos::Experimental::OpenMPTarget>::View<char[2]>' requested here
+        Kokkos::View<int[2], ExecSpace> v("v");
+                                        ^
+In file included from main.cpp:1:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Core.hpp:53:
+In file included from ./KokkosCore_Config_DeclareBackend.hpp:50:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/decl/Kokkos_Declare_OPENMPTARGET.hpp:49:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_OpenMPTarget.hpp:167:
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:807:11: warning: Type '(lambda at main.cpp:49:21)' is not trivially copyable and not guaranteed to be mapped correctly [-Wopenmp-mapping]
+        : a_functor) is_device_ptr(scratch_ptr)
+          ^~~~~~~~~
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:768:5: note: in instantiation of function template specialization 'Kokkos::Impl::ParallelFor<(lambda at main.cpp:49:21), Kokkos::TeamPolicy<Kokkos::Experimental::OpenMPTarget>, Kokkos::Experimental::OpenMPTarget>::execute_impl<void>' requested here
+    execute_impl<WorkTag>();
+    ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:168:11: note: in instantiation of member function 'Kokkos::Impl::ParallelFor<(lambda at main.cpp:49:21), Kokkos::TeamPolicy<Kokkos::Experimental::OpenMPTarget>, Kokkos::Experimental::OpenMPTarget>::execute' requested here
+  closure.execute();
+          ^
+main.cpp:48:17: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::TeamPolicy<Kokkos::Experimental::OpenMPTarget>, (lambda at main.cpp:49:21)>' requested here
+        Kokkos::parallel_for(
+                ^
+In file included from main.cpp:1:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Core.hpp:53:
+In file included from ./KokkosCore_Config_DeclareBackend.hpp:50:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/decl/Kokkos_Declare_OPENMPTARGET.hpp:49:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_OpenMPTarget.hpp:167:
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:834:13: warning: Type 'const (lambda at main.cpp:49:21)' is not trivially copyable and not guaranteed to be mapped correctly [-Wopenmp-mapping]
+            m_functor(team);
+            ^~~~~~~~~
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:92:59: warning: Type 'Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, long>' is not trivially copyable and not guaranteed to be mapped correctly [-Wopenmp-mapping]
+#pragma omp target teams distribute parallel for map(to : a_functor)
+                                                          ^~~~~~~~~
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:77:26: note: in instantiation of function template specialization 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, long>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Experimental::OpenMPTarget>::execute_impl<void>' requested here
+  void execute() const { execute_impl<WorkTag>(); }
+                         ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:168:11: note: in instantiation of member function 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, long>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Experimental::OpenMPTarget>::execute' requested here
+  closure.execute();
+          ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:199:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, long>>' requested here
+  ::Kokkos::parallel_for(policy, functor, str);
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:301:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, long>>' requested here
+    Kokkos::parallel_for("Kokkos::ViewCopy-1D",
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:689:9: note: in instantiation of member function 'Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, long>::ViewCopy' requested here
+        Kokkos::Impl::ViewCopy<
+        ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:1724:11: note: in instantiation of function template specialization 'Kokkos::Impl::view_copy<Kokkos::View<int[2], Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::HostSpace>, Kokkos::Experimental::EmptyViewHooks, Kokkos::MemoryTraits<0>>, Kokkos::View<int[2], Kokkos::Experimental::OpenMPTarget>>' requested here
+    Impl::view_copy(dst, src);
+          ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:3446:3: note: in instantiation of function template specialization 'Kokkos::deep_copy<int[2], Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::HostSpace>, Kokkos::Experimental::EmptyViewHooks, Kokkos::MemoryTraits<0>, int[2], Kokkos::Experimental::OpenMPTarget>' requested here
+  deep_copy(mirror, src);
+  ^
+main.cpp:65:28: note: in instantiation of function template specialization 'Kokkos::create_mirror_view_and_copy<Kokkos::HostSpace, int[2], Kokkos::Experimental::OpenMPTarget>' requested here
+        auto h_v = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace(), v);
+                           ^
+In file included from main.cpp:1:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Core.hpp:53:
+In file included from ./KokkosCore_Config_DeclareBackend.hpp:50:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/decl/Kokkos_Declare_OPENMPTARGET.hpp:49:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_OpenMPTarget.hpp:167:
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:92:59: warning: Type 'Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutLeft, Kokkos::Experimental::OpenMPTarget, 1, long>' is not trivially copyable and not guaranteed to be mapped correctly [-Wopenmp-mapping]
+#pragma omp target teams distribute parallel for map(to : a_functor)
+                                                          ^~~~~~~~~
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:77:26: note: in instantiation of function template specialization 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutLeft, Kokkos::Experimental::OpenMPTarget, 1, long>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Experimental::OpenMPTarget>::execute_impl<void>' requested here
+  void execute() const { execute_impl<WorkTag>(); }
+                         ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:168:11: note: in instantiation of member function 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutLeft, Kokkos::Experimental::OpenMPTarget, 1, long>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Experimental::OpenMPTarget>::execute' requested here
+  closure.execute();
+          ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:199:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutLeft, Kokkos::Experimental::OpenMPTarget, 1, long>>' requested here
+  ::Kokkos::parallel_for(policy, functor, str);
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:301:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutLeft, Kokkos::Experimental::OpenMPTarget, 1, long>>' requested here
+    Kokkos::parallel_for("Kokkos::ViewCopy-1D",
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:695:9: note: in instantiation of member function 'Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutLeft, Kokkos::Experimental::OpenMPTarget, 1, long>::ViewCopy' requested here
+        Kokkos::Impl::ViewCopy<
+        ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:1724:11: note: in instantiation of function template specialization 'Kokkos::Impl::view_copy<Kokkos::View<int[2], Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::HostSpace>, Kokkos::Experimental::EmptyViewHooks, Kokkos::MemoryTraits<0>>, Kokkos::View<int[2], Kokkos::Experimental::OpenMPTarget>>' requested here
+    Impl::view_copy(dst, src);
+          ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:3446:3: note: in instantiation of function template specialization 'Kokkos::deep_copy<int[2], Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::HostSpace>, Kokkos::Experimental::EmptyViewHooks, Kokkos::MemoryTraits<0>, int[2], Kokkos::Experimental::OpenMPTarget>' requested here
+  deep_copy(mirror, src);
+  ^
+main.cpp:65:28: note: in instantiation of function template specialization 'Kokkos::create_mirror_view_and_copy<Kokkos::HostSpace, int[2], Kokkos::Experimental::OpenMPTarget>' requested here
+        auto h_v = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace(), v);
+                           ^
+In file included from main.cpp:1:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Core.hpp:53:
+In file included from ./KokkosCore_Config_DeclareBackend.hpp:50:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/decl/Kokkos_Declare_OPENMPTARGET.hpp:49:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_OpenMPTarget.hpp:167:
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:92:59: warning: Type 'Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>' is not trivially copyable and not guaranteed to be mapped correctly [-Wopenmp-mapping]
+#pragma omp target teams distribute parallel for map(to : a_functor)
+                                                          ^~~~~~~~~
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:77:26: note: in instantiation of function template specialization 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Experimental::OpenMPTarget>::execute_impl<void>' requested here
+  void execute() const { execute_impl<WorkTag>(); }
+                         ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:168:11: note: in instantiation of member function 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Experimental::OpenMPTarget>::execute' requested here
+  closure.execute();
+          ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:199:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>>' requested here
+  ::Kokkos::parallel_for(policy, functor, str);
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:301:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>>' requested here
+    Kokkos::parallel_for("Kokkos::ViewCopy-1D",
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:717:9: note: in instantiation of member function 'Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>::ViewCopy' requested here
+        Kokkos::Impl::ViewCopy<
+        ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:1724:11: note: in instantiation of function template specialization 'Kokkos::Impl::view_copy<Kokkos::View<int[2], Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::HostSpace>, Kokkos::Experimental::EmptyViewHooks, Kokkos::MemoryTraits<0>>, Kokkos::View<int[2], Kokkos::Experimental::OpenMPTarget>>' requested here
+    Impl::view_copy(dst, src);
+          ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:3446:3: note: in instantiation of function template specialization 'Kokkos::deep_copy<int[2], Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::HostSpace>, Kokkos::Experimental::EmptyViewHooks, Kokkos::MemoryTraits<0>, int[2], Kokkos::Experimental::OpenMPTarget>' requested here
+  deep_copy(mirror, src);
+  ^
+main.cpp:65:28: note: in instantiation of function template specialization 'Kokkos::create_mirror_view_and_copy<Kokkos::HostSpace, int[2], Kokkos::Experimental::OpenMPTarget>' requested here
+        auto h_v = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace(), v);
+                           ^
+In file included from main.cpp:1:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Core.hpp:53:
+In file included from ./KokkosCore_Config_DeclareBackend.hpp:50:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/decl/Kokkos_Declare_OPENMPTARGET.hpp:49:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_OpenMPTarget.hpp:167:
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:92:59: warning: Type 'Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutLeft, Kokkos::Experimental::OpenMPTarget, 1, int>' is not trivially copyable and not guaranteed to be mapped correctly [-Wopenmp-mapping]
+#pragma omp target teams distribute parallel for map(to : a_functor)
+                                                          ^~~~~~~~~
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:77:26: note: in instantiation of function template specialization 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutLeft, Kokkos::Experimental::OpenMPTarget, 1, int>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Experimental::OpenMPTarget>::execute_impl<void>' requested here
+  void execute() const { execute_impl<WorkTag>(); }
+                         ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:168:11: note: in instantiation of member function 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutLeft, Kokkos::Experimental::OpenMPTarget, 1, int>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Experimental::OpenMPTarget>::execute' requested here
+  closure.execute();
+          ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:199:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutLeft, Kokkos::Experimental::OpenMPTarget, 1, int>>' requested here
+  ::Kokkos::parallel_for(policy, functor, str);
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:301:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutLeft, Kokkos::Experimental::OpenMPTarget, 1, int>>' requested here
+    Kokkos::parallel_for("Kokkos::ViewCopy-1D",
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:723:9: note: in instantiation of member function 'Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutLeft, Kokkos::Experimental::OpenMPTarget, 1, int>::ViewCopy' requested here
+        Kokkos::Impl::ViewCopy<
+        ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:1724:11: note: in instantiation of function template specialization 'Kokkos::Impl::view_copy<Kokkos::View<int[2], Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::HostSpace>, Kokkos::Experimental::EmptyViewHooks, Kokkos::MemoryTraits<0>>, Kokkos::View<int[2], Kokkos::Experimental::OpenMPTarget>>' requested here
+    Impl::view_copy(dst, src);
+          ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:3446:3: note: in instantiation of function template specialization 'Kokkos::deep_copy<int[2], Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::HostSpace>, Kokkos::Experimental::EmptyViewHooks, Kokkos::MemoryTraits<0>, int[2], Kokkos::Experimental::OpenMPTarget>' requested here
+  deep_copy(mirror, src);
+  ^
+main.cpp:65:28: note: in instantiation of function template specialization 'Kokkos::create_mirror_view_and_copy<Kokkos::HostSpace, int[2], Kokkos::Experimental::OpenMPTarget>' requested here
+        auto h_v = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace(), v);
+                           ^
+12 warnings generated.
+In file included from main.cpp:1:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Core.hpp:53:
+In file included from ./KokkosCore_Config_DeclareBackend.hpp:50:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/decl/Kokkos_Declare_OPENMPTARGET.hpp:49:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_OpenMPTarget.hpp:167:
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:92:59: warning: Type 'Kokkos::Impl::ViewFill<Kokkos::View<unsigned int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>' is not trivially copyable and not guaranteed to be mapped correctly [-Wopenmp-mapping]
+#pragma omp target teams distribute parallel for map(to : a_functor)
+                                                          ^~~~~~~~~
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:77:26: note: in instantiation of function template specialization 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewFill<Kokkos::View<unsigned int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Experimental::OpenMPTarget>::execute_impl<void>' requested here
+  void execute() const { execute_impl<WorkTag>(); }
+                         ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:168:11: note: in instantiation of member function 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewFill<Kokkos::View<unsigned int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Experimental::OpenMPTarget>::execute' requested here
+  closure.execute();
+          ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:199:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Impl::ViewFill<Kokkos::View<unsigned int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>>' requested here
+  ::Kokkos::parallel_for(policy, functor, str);
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:96:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Impl::ViewFill<Kokkos::View<unsigned int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>>' requested here
+    Kokkos::parallel_for("Kokkos::ViewFill-1D",
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:1271:5: note: in instantiation of member function 'Kokkos::Impl::ViewFill<Kokkos::View<unsigned int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>::ViewFill' requested here
+    Kokkos::Impl::ViewFill<ViewTypeFlat, Kokkos::LayoutRight, ExecutionSpace,
+    ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:1284:5: note: (skipping 1 context in backtrace; use -ftemplate-backtrace-limit=0 to see all)
+    contiguous_fill(exec_space, dst, value);
+    ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3041:13: note: in instantiation of member function 'Kokkos::Impl::ZeroMemset<Kokkos::Experimental::OpenMPTarget, unsigned int *, Kokkos::Experimental::OpenMPTargetSpace, Kokkos::MemoryTraits<1>>::ZeroMemset' requested here
+      (void)ZeroMemset<ExecSpace, ValueType*, typename DeviceType::memory_space,
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3436:25: note: in instantiation of function template specialization 'Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, unsigned int, true>::construct_shared_allocation<unsigned int>' requested here
+      record->m_destroy.construct_shared_allocation();
+                        ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_View.hpp:1462:60: note: in instantiation of function template specialization 'Kokkos::Impl::ViewMapping<Kokkos::ViewTraits<unsigned int *, Kokkos::Experimental::OpenMPTargetSpace>, void>::allocate_shared<std::basic_string<char>, std::integral_constant<unsigned int, 0>, Kokkos::Experimental::OpenMPTargetSpace, Kokkos::Experimental::OpenMPTarget>' requested here
+    Kokkos::Impl::SharedAllocationRecord<>* record = m_map.allocate_shared(
+                                                           ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_View.hpp:1582:9: note: in instantiation of function template specialization 'Kokkos::View<unsigned int *, Kokkos::Experimental::OpenMPTargetSpace>::View<std::basic_string<char>>' requested here
+      : View(Impl::ViewCtorProp<std::string>(arg_label),
+        ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_UniqueToken.hpp:123:9: note: in instantiation of function template specialization 'Kokkos::View<unsigned int *, Kokkos::Experimental::OpenMPTargetSpace>::View<char[35]>' requested here
+      : m_buffer_view(
+        ^
+In file included from main.cpp:1:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Core.hpp:53:
+In file included from ./KokkosCore_Config_DeclareBackend.hpp:50:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/decl/Kokkos_Declare_OPENMPTARGET.hpp:49:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_OpenMPTarget.hpp:167:
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:92:59: warning: Type 'Kokkos::Impl::ViewFill<Kokkos::View<unsigned int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1>' is not trivially copyable and not guaranteed to be mapped correctly [-Wopenmp-mapping]
+#pragma omp target teams distribute parallel for map(to : a_functor)
+                                                          ^~~~~~~~~
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:77:26: note: in instantiation of function template specialization 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewFill<Kokkos::View<unsigned int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Experimental::OpenMPTarget>::execute_impl<void>' requested here
+  void execute() const { execute_impl<WorkTag>(); }
+                         ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:168:11: note: in instantiation of member function 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewFill<Kokkos::View<unsigned int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Experimental::OpenMPTarget>::execute' requested here
+  closure.execute();
+          ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:199:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Impl::ViewFill<Kokkos::View<unsigned int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1>>' requested here
+  ::Kokkos::parallel_for(policy, functor, str);
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:96:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Impl::ViewFill<Kokkos::View<unsigned int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1>>' requested here
+    Kokkos::parallel_for("Kokkos::ViewFill-1D",
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:1275:5: note: in instantiation of member function 'Kokkos::Impl::ViewFill<Kokkos::View<unsigned int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1>::ViewFill' requested here
+    Kokkos::Impl::ViewFill<ViewTypeFlat, Kokkos::LayoutRight, ExecutionSpace,
+    ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:1284:5: note: (skipping 1 context in backtrace; use -ftemplate-backtrace-limit=0 to see all)
+    contiguous_fill(exec_space, dst, value);
+    ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3041:13: note: in instantiation of member function 'Kokkos::Impl::ZeroMemset<Kokkos::Experimental::OpenMPTarget, unsigned int *, Kokkos::Experimental::OpenMPTargetSpace, Kokkos::MemoryTraits<1>>::ZeroMemset' requested here
+      (void)ZeroMemset<ExecSpace, ValueType*, typename DeviceType::memory_space,
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3436:25: note: in instantiation of function template specialization 'Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, unsigned int, true>::construct_shared_allocation<unsigned int>' requested here
+      record->m_destroy.construct_shared_allocation();
+                        ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_View.hpp:1462:60: note: in instantiation of function template specialization 'Kokkos::Impl::ViewMapping<Kokkos::ViewTraits<unsigned int *, Kokkos::Experimental::OpenMPTargetSpace>, void>::allocate_shared<std::basic_string<char>, std::integral_constant<unsigned int, 0>, Kokkos::Experimental::OpenMPTargetSpace, Kokkos::Experimental::OpenMPTarget>' requested here
+    Kokkos::Impl::SharedAllocationRecord<>* record = m_map.allocate_shared(
+                                                           ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_View.hpp:1582:9: note: in instantiation of function template specialization 'Kokkos::View<unsigned int *, Kokkos::Experimental::OpenMPTargetSpace>::View<std::basic_string<char>>' requested here
+      : View(Impl::ViewCtorProp<std::string>(arg_label),
+        ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_UniqueToken.hpp:123:9: note: in instantiation of function template specialization 'Kokkos::View<unsigned int *, Kokkos::Experimental::OpenMPTargetSpace>::View<char[35]>' requested here
+      : m_buffer_view(
+        ^
+In file included from main.cpp:1:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Core.hpp:53:
+In file included from ./KokkosCore_Config_DeclareBackend.hpp:50:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/decl/Kokkos_Declare_OPENMPTARGET.hpp:49:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_OpenMPTarget.hpp:167:
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:92:59: warning: Type 'Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, unsigned int, true>' is not trivially copyable and not guaranteed to be mapped correctly [-Wopenmp-mapping]
+#pragma omp target teams distribute parallel for map(to : a_functor)
+                                                          ^~~~~~~~~
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:77:26: note: in instantiation of function template specialization 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, unsigned int, true>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Experimental::OpenMPTarget>::execute_impl<void>' requested here
+  void execute() const { execute_impl<WorkTag>(); }
+                         ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3086:15: note: in instantiation of member function 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, unsigned int, true>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Experimental::OpenMPTarget>::execute' requested here
+      closure.execute();
+              ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3055:7: note: in instantiation of member function 'Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, unsigned int, true>::parallel_for_implementation' requested here
+      parallel_for_implementation();
+      ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3436:25: note: in instantiation of function template specialization 'Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, unsigned int, true>::construct_shared_allocation<unsigned int>' requested here
+      record->m_destroy.construct_shared_allocation();
+                        ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_View.hpp:1462:60: note: in instantiation of function template specialization 'Kokkos::Impl::ViewMapping<Kokkos::ViewTraits<unsigned int *, Kokkos::Experimental::OpenMPTargetSpace>, void>::allocate_shared<std::basic_string<char>, std::integral_constant<unsigned int, 0>, Kokkos::Experimental::OpenMPTargetSpace, Kokkos::Experimental::OpenMPTarget>' requested here
+    Kokkos::Impl::SharedAllocationRecord<>* record = m_map.allocate_shared(
+                                                           ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_View.hpp:1582:9: note: in instantiation of function template specialization 'Kokkos::View<unsigned int *, Kokkos::Experimental::OpenMPTargetSpace>::View<std::basic_string<char>>' requested here
+      : View(Impl::ViewCtorProp<std::string>(arg_label),
+        ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_UniqueToken.hpp:123:9: note: in instantiation of function template specialization 'Kokkos::View<unsigned int *, Kokkos::Experimental::OpenMPTargetSpace>::View<char[35]>' requested here
+      : m_buffer_view(
+        ^
+In file included from main.cpp:1:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Core.hpp:53:
+In file included from ./KokkosCore_Config_DeclareBackend.hpp:50:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/decl/Kokkos_Declare_OPENMPTARGET.hpp:49:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_OpenMPTarget.hpp:167:
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:92:59: warning: Type 'Kokkos::Impl::ViewFill<Kokkos::View<int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>' is not trivially copyable and not guaranteed to be mapped correctly [-Wopenmp-mapping]
+#pragma omp target teams distribute parallel for map(to : a_functor)
+                                                          ^~~~~~~~~
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:77:26: note: in instantiation of function template specialization 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewFill<Kokkos::View<int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Experimental::OpenMPTarget>::execute_impl<void>' requested here
+  void execute() const { execute_impl<WorkTag>(); }
+                         ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:168:11: note: in instantiation of member function 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewFill<Kokkos::View<int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Experimental::OpenMPTarget>::execute' requested here
+  closure.execute();
+          ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:199:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Impl::ViewFill<Kokkos::View<int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>>' requested here
+  ::Kokkos::parallel_for(policy, functor, str);
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:96:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Impl::ViewFill<Kokkos::View<int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>>' requested here
+    Kokkos::parallel_for("Kokkos::ViewFill-1D",
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:1271:5: note: in instantiation of member function 'Kokkos::Impl::ViewFill<Kokkos::View<int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>::ViewFill' requested here
+    Kokkos::Impl::ViewFill<ViewTypeFlat, Kokkos::LayoutRight, ExecutionSpace,
+    ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:1284:5: note: (skipping 1 context in backtrace; use -ftemplate-backtrace-limit=0 to see all)
+    contiguous_fill(exec_space, dst, value);
+    ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3041:13: note: in instantiation of member function 'Kokkos::Impl::ZeroMemset<Kokkos::Experimental::OpenMPTarget, int *, Kokkos::Experimental::OpenMPTargetSpace, Kokkos::MemoryTraits<1>>::ZeroMemset' requested here
+      (void)ZeroMemset<ExecSpace, ValueType*, typename DeviceType::memory_space,
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3436:25: note: in instantiation of function template specialization 'Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, int, true>::construct_shared_allocation<int>' requested here
+      record->m_destroy.construct_shared_allocation();
+                        ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_View.hpp:1462:60: note: in instantiation of function template specialization 'Kokkos::Impl::ViewMapping<Kokkos::ViewTraits<int[2], Kokkos::Experimental::OpenMPTarget>, void>::allocate_shared<std::basic_string<char>, std::integral_constant<unsigned int, 0>, Kokkos::Experimental::OpenMPTargetSpace, Kokkos::Experimental::OpenMPTarget>' requested here
+    Kokkos::Impl::SharedAllocationRecord<>* record = m_map.allocate_shared(
+                                                           ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_View.hpp:1582:9: note: in instantiation of function template specialization 'Kokkos::View<int[2], Kokkos::Experimental::OpenMPTarget>::View<std::basic_string<char>>' requested here
+      : View(Impl::ViewCtorProp<std::string>(arg_label),
+        ^
+main.cpp:18:41: note: in instantiation of function template specialization 'Kokkos::View<int[2], Kokkos::Experimental::OpenMPTarget>::View<char[2]>' requested here
+        Kokkos::View<int[2], ExecSpace> v("v");
+                                        ^
+In file included from main.cpp:1:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Core.hpp:53:
+In file included from ./KokkosCore_Config_DeclareBackend.hpp:50:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/decl/Kokkos_Declare_OPENMPTARGET.hpp:49:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_OpenMPTarget.hpp:167:
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:92:59: warning: Type 'Kokkos::Impl::ViewFill<Kokkos::View<int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1>' is not trivially copyable and not guaranteed to be mapped correctly [-Wopenmp-mapping]
+#pragma omp target teams distribute parallel for map(to : a_functor)
+                                                          ^~~~~~~~~
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:77:26: note: in instantiation of function template specialization 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewFill<Kokkos::View<int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Experimental::OpenMPTarget>::execute_impl<void>' requested here
+  void execute() const { execute_impl<WorkTag>(); }
+                         ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:168:11: note: in instantiation of member function 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewFill<Kokkos::View<int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Experimental::OpenMPTarget>::execute' requested here
+  closure.execute();
+          ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:199:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Impl::ViewFill<Kokkos::View<int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1>>' requested here
+  ::Kokkos::parallel_for(policy, functor, str);
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:96:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Impl::ViewFill<Kokkos::View<int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1>>' requested here
+    Kokkos::parallel_for("Kokkos::ViewFill-1D",
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:1275:5: note: in instantiation of member function 'Kokkos::Impl::ViewFill<Kokkos::View<int *, Kokkos::LayoutRight, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1>::ViewFill' requested here
+    Kokkos::Impl::ViewFill<ViewTypeFlat, Kokkos::LayoutRight, ExecutionSpace,
+    ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:1284:5: note: (skipping 1 context in backtrace; use -ftemplate-backtrace-limit=0 to see all)
+    contiguous_fill(exec_space, dst, value);
+    ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3041:13: note: in instantiation of member function 'Kokkos::Impl::ZeroMemset<Kokkos::Experimental::OpenMPTarget, int *, Kokkos::Experimental::OpenMPTargetSpace, Kokkos::MemoryTraits<1>>::ZeroMemset' requested here
+      (void)ZeroMemset<ExecSpace, ValueType*, typename DeviceType::memory_space,
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3436:25: note: in instantiation of function template specialization 'Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, int, true>::construct_shared_allocation<int>' requested here
+      record->m_destroy.construct_shared_allocation();
+                        ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_View.hpp:1462:60: note: in instantiation of function template specialization 'Kokkos::Impl::ViewMapping<Kokkos::ViewTraits<int[2], Kokkos::Experimental::OpenMPTarget>, void>::allocate_shared<std::basic_string<char>, std::integral_constant<unsigned int, 0>, Kokkos::Experimental::OpenMPTargetSpace, Kokkos::Experimental::OpenMPTarget>' requested here
+    Kokkos::Impl::SharedAllocationRecord<>* record = m_map.allocate_shared(
+                                                           ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_View.hpp:1582:9: note: in instantiation of function template specialization 'Kokkos::View<int[2], Kokkos::Experimental::OpenMPTarget>::View<std::basic_string<char>>' requested here
+      : View(Impl::ViewCtorProp<std::string>(arg_label),
+        ^
+main.cpp:18:41: note: in instantiation of function template specialization 'Kokkos::View<int[2], Kokkos::Experimental::OpenMPTarget>::View<char[2]>' requested here
+        Kokkos::View<int[2], ExecSpace> v("v");
+                                        ^
+In file included from main.cpp:1:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Core.hpp:53:
+In file included from ./KokkosCore_Config_DeclareBackend.hpp:50:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/decl/Kokkos_Declare_OPENMPTARGET.hpp:49:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_OpenMPTarget.hpp:167:
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:92:59: warning: Type 'Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, int, true>' is not trivially copyable and not guaranteed to be mapped correctly [-Wopenmp-mapping]
+#pragma omp target teams distribute parallel for map(to : a_functor)
+                                                          ^~~~~~~~~
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:77:26: note: in instantiation of function template specialization 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, int, true>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Experimental::OpenMPTarget>::execute_impl<void>' requested here
+  void execute() const { execute_impl<WorkTag>(); }
+                         ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3086:15: note: in instantiation of member function 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, int, true>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Experimental::OpenMPTarget>::execute' requested here
+      closure.execute();
+              ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3055:7: note: in instantiation of member function 'Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, int, true>::parallel_for_implementation' requested here
+      parallel_for_implementation();
+      ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/impl/Kokkos_ViewMapping.hpp:3436:25: note: in instantiation of function template specialization 'Kokkos::Impl::ViewValueFunctor<Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::Experimental::OpenMPTargetSpace>, int, true>::construct_shared_allocation<int>' requested here
+      record->m_destroy.construct_shared_allocation();
+                        ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_View.hpp:1462:60: note: in instantiation of function template specialization 'Kokkos::Impl::ViewMapping<Kokkos::ViewTraits<int[2], Kokkos::Experimental::OpenMPTarget>, void>::allocate_shared<std::basic_string<char>, std::integral_constant<unsigned int, 0>, Kokkos::Experimental::OpenMPTargetSpace, Kokkos::Experimental::OpenMPTarget>' requested here
+    Kokkos::Impl::SharedAllocationRecord<>* record = m_map.allocate_shared(
+                                                           ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_View.hpp:1582:9: note: in instantiation of function template specialization 'Kokkos::View<int[2], Kokkos::Experimental::OpenMPTarget>::View<std::basic_string<char>>' requested here
+      : View(Impl::ViewCtorProp<std::string>(arg_label),
+        ^
+main.cpp:18:41: note: in instantiation of function template specialization 'Kokkos::View<int[2], Kokkos::Experimental::OpenMPTarget>::View<char[2]>' requested here
+        Kokkos::View<int[2], ExecSpace> v("v");
+                                        ^
+In file included from main.cpp:1:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Core.hpp:53:
+In file included from ./KokkosCore_Config_DeclareBackend.hpp:50:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/decl/Kokkos_Declare_OPENMPTARGET.hpp:49:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_OpenMPTarget.hpp:167:
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:807:11: warning: Type '(lambda at main.cpp:49:21)' is not trivially copyable and not guaranteed to be mapped correctly [-Wopenmp-mapping]
+        : a_functor) is_device_ptr(scratch_ptr)
+          ^~~~~~~~~
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:768:5: note: in instantiation of function template specialization 'Kokkos::Impl::ParallelFor<(lambda at main.cpp:49:21), Kokkos::TeamPolicy<Kokkos::Experimental::OpenMPTarget>, Kokkos::Experimental::OpenMPTarget>::execute_impl<void>' requested here
+    execute_impl<WorkTag>();
+    ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:168:11: note: in instantiation of member function 'Kokkos::Impl::ParallelFor<(lambda at main.cpp:49:21), Kokkos::TeamPolicy<Kokkos::Experimental::OpenMPTarget>, Kokkos::Experimental::OpenMPTarget>::execute' requested here
+  closure.execute();
+          ^
+main.cpp:48:17: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::TeamPolicy<Kokkos::Experimental::OpenMPTarget>, (lambda at main.cpp:49:21)>' requested here
+        Kokkos::parallel_for(
+                ^
+In file included from main.cpp:1:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Core.hpp:53:
+In file included from ./KokkosCore_Config_DeclareBackend.hpp:50:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/decl/Kokkos_Declare_OPENMPTARGET.hpp:49:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_OpenMPTarget.hpp:167:
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:834:13: warning: Type 'const (lambda at main.cpp:49:21)' is not trivially copyable and not guaranteed to be mapped correctly [-Wopenmp-mapping]
+            m_functor(team);
+            ^~~~~~~~~
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:92:59: warning: Type 'Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, long>' is not trivially copyable and not guaranteed to be mapped correctly [-Wopenmp-mapping]
+#pragma omp target teams distribute parallel for map(to : a_functor)
+                                                          ^~~~~~~~~
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:77:26: note: in instantiation of function template specialization 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, long>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Experimental::OpenMPTarget>::execute_impl<void>' requested here
+  void execute() const { execute_impl<WorkTag>(); }
+                         ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:168:11: note: in instantiation of member function 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, long>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Experimental::OpenMPTarget>::execute' requested here
+  closure.execute();
+          ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:199:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, long>>' requested here
+  ::Kokkos::parallel_for(policy, functor, str);
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:301:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, long>>' requested here
+    Kokkos::parallel_for("Kokkos::ViewCopy-1D",
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:689:9: note: in instantiation of member function 'Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, long>::ViewCopy' requested here
+        Kokkos::Impl::ViewCopy<
+        ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:1724:11: note: in instantiation of function template specialization 'Kokkos::Impl::view_copy<Kokkos::View<int[2], Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::HostSpace>, Kokkos::Experimental::EmptyViewHooks, Kokkos::MemoryTraits<0>>, Kokkos::View<int[2], Kokkos::Experimental::OpenMPTarget>>' requested here
+    Impl::view_copy(dst, src);
+          ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:3446:3: note: in instantiation of function template specialization 'Kokkos::deep_copy<int[2], Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::HostSpace>, Kokkos::Experimental::EmptyViewHooks, Kokkos::MemoryTraits<0>, int[2], Kokkos::Experimental::OpenMPTarget>' requested here
+  deep_copy(mirror, src);
+  ^
+main.cpp:65:28: note: in instantiation of function template specialization 'Kokkos::create_mirror_view_and_copy<Kokkos::HostSpace, int[2], Kokkos::Experimental::OpenMPTarget>' requested here
+        auto h_v = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace(), v);
+                           ^
+In file included from main.cpp:1:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Core.hpp:53:
+In file included from ./KokkosCore_Config_DeclareBackend.hpp:50:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/decl/Kokkos_Declare_OPENMPTARGET.hpp:49:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_OpenMPTarget.hpp:167:
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:92:59: warning: Type 'Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutLeft, Kokkos::Experimental::OpenMPTarget, 1, long>' is not trivially copyable and not guaranteed to be mapped correctly [-Wopenmp-mapping]
+#pragma omp target teams distribute parallel for map(to : a_functor)
+                                                          ^~~~~~~~~
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:77:26: note: in instantiation of function template specialization 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutLeft, Kokkos::Experimental::OpenMPTarget, 1, long>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Experimental::OpenMPTarget>::execute_impl<void>' requested here
+  void execute() const { execute_impl<WorkTag>(); }
+                         ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:168:11: note: in instantiation of member function 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutLeft, Kokkos::Experimental::OpenMPTarget, 1, long>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Experimental::OpenMPTarget>::execute' requested here
+  closure.execute();
+          ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:199:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutLeft, Kokkos::Experimental::OpenMPTarget, 1, long>>' requested here
+  ::Kokkos::parallel_for(policy, functor, str);
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:301:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<long>>, Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutLeft, Kokkos::Experimental::OpenMPTarget, 1, long>>' requested here
+    Kokkos::parallel_for("Kokkos::ViewCopy-1D",
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:695:9: note: in instantiation of member function 'Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutLeft, Kokkos::Experimental::OpenMPTarget, 1, long>::ViewCopy' requested here
+        Kokkos::Impl::ViewCopy<
+        ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:1724:11: note: in instantiation of function template specialization 'Kokkos::Impl::view_copy<Kokkos::View<int[2], Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::HostSpace>, Kokkos::Experimental::EmptyViewHooks, Kokkos::MemoryTraits<0>>, Kokkos::View<int[2], Kokkos::Experimental::OpenMPTarget>>' requested here
+    Impl::view_copy(dst, src);
+          ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:3446:3: note: in instantiation of function template specialization 'Kokkos::deep_copy<int[2], Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::HostSpace>, Kokkos::Experimental::EmptyViewHooks, Kokkos::MemoryTraits<0>, int[2], Kokkos::Experimental::OpenMPTarget>' requested here
+  deep_copy(mirror, src);
+  ^
+main.cpp:65:28: note: in instantiation of function template specialization 'Kokkos::create_mirror_view_and_copy<Kokkos::HostSpace, int[2], Kokkos::Experimental::OpenMPTarget>' requested here
+        auto h_v = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace(), v);
+                           ^
+In file included from main.cpp:1:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Core.hpp:53:
+In file included from ./KokkosCore_Config_DeclareBackend.hpp:50:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/decl/Kokkos_Declare_OPENMPTARGET.hpp:49:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_OpenMPTarget.hpp:167:
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:92:59: warning: Type 'Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>' is not trivially copyable and not guaranteed to be mapped correctly [-Wopenmp-mapping]
+#pragma omp target teams distribute parallel for map(to : a_functor)
+                                                          ^~~~~~~~~
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:77:26: note: in instantiation of function template specialization 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Experimental::OpenMPTarget>::execute_impl<void>' requested here
+  void execute() const { execute_impl<WorkTag>(); }
+                         ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:168:11: note: in instantiation of member function 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Experimental::OpenMPTarget>::execute' requested here
+  closure.execute();
+          ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:199:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>>' requested here
+  ::Kokkos::parallel_for(policy, functor, str);
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:301:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>>' requested here
+    Kokkos::parallel_for("Kokkos::ViewCopy-1D",
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:717:9: note: in instantiation of member function 'Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutRight, Kokkos::Experimental::OpenMPTarget, 1, int>::ViewCopy' requested here
+        Kokkos::Impl::ViewCopy<
+        ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:1724:11: note: in instantiation of function template specialization 'Kokkos::Impl::view_copy<Kokkos::View<int[2], Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::HostSpace>, Kokkos::Experimental::EmptyViewHooks, Kokkos::MemoryTraits<0>>, Kokkos::View<int[2], Kokkos::Experimental::OpenMPTarget>>' requested here
+    Impl::view_copy(dst, src);
+          ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:3446:3: note: in instantiation of function template specialization 'Kokkos::deep_copy<int[2], Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::HostSpace>, Kokkos::Experimental::EmptyViewHooks, Kokkos::MemoryTraits<0>, int[2], Kokkos::Experimental::OpenMPTarget>' requested here
+  deep_copy(mirror, src);
+  ^
+main.cpp:65:28: note: in instantiation of function template specialization 'Kokkos::create_mirror_view_and_copy<Kokkos::HostSpace, int[2], Kokkos::Experimental::OpenMPTarget>' requested here
+        auto h_v = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace(), v);
+                           ^
+In file included from main.cpp:1:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Core.hpp:53:
+In file included from ./KokkosCore_Config_DeclareBackend.hpp:50:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/decl/Kokkos_Declare_OPENMPTARGET.hpp:49:
+In file included from /global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_OpenMPTarget.hpp:167:
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:92:59: warning: Type 'Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutLeft, Kokkos::Experimental::OpenMPTarget, 1, int>' is not trivially copyable and not guaranteed to be mapped correctly [-Wopenmp-mapping]
+#pragma omp target teams distribute parallel for map(to : a_functor)
+                                                          ^~~~~~~~~
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp:77:26: note: in instantiation of function template specialization 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutLeft, Kokkos::Experimental::OpenMPTarget, 1, int>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Experimental::OpenMPTarget>::execute_impl<void>' requested here
+  void execute() const { execute_impl<WorkTag>(); }
+                         ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:168:11: note: in instantiation of member function 'Kokkos::Impl::ParallelFor<Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutLeft, Kokkos::Experimental::OpenMPTarget, 1, int>, Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Experimental::OpenMPTarget>::execute' requested here
+  closure.execute();
+          ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_Parallel.hpp:199:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutLeft, Kokkos::Experimental::OpenMPTarget, 1, int>>' requested here
+  ::Kokkos::parallel_for(policy, functor, str);
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:301:13: note: in instantiation of function template specialization 'Kokkos::parallel_for<Kokkos::RangePolicy<Kokkos::Experimental::OpenMPTarget, Kokkos::IndexType<int>>, Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutLeft, Kokkos::Experimental::OpenMPTarget, 1, int>>' requested here
+    Kokkos::parallel_for("Kokkos::ViewCopy-1D",
+            ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:723:9: note: in instantiation of member function 'Kokkos::Impl::ViewCopy<Kokkos::View<int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::View<const int *, Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Experimental::OpenMPTarget, Kokkos::AnonymousSpace>, Kokkos::MemoryTraits<0>>, Kokkos::LayoutLeft, Kokkos::Experimental::OpenMPTarget, 1, int>::ViewCopy' requested here
+        Kokkos::Impl::ViewCopy<
+        ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:1724:11: note: in instantiation of function template specialization 'Kokkos::Impl::view_copy<Kokkos::View<int[2], Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::HostSpace>, Kokkos::Experimental::EmptyViewHooks, Kokkos::MemoryTraits<0>>, Kokkos::View<int[2], Kokkos::Experimental::OpenMPTarget>>' requested here
+    Impl::view_copy(dst, src);
+          ^
+/global/homes/r/rgayatri/Kokkos/rgayatri-kokkos/core/src/Kokkos_CopyViews.hpp:3446:3: note: in instantiation of function template specialization 'Kokkos::deep_copy<int[2], Kokkos::LayoutLeft, Kokkos::Device<Kokkos::Serial, Kokkos::HostSpace>, Kokkos::Experimental::EmptyViewHooks, Kokkos::MemoryTraits<0>, int[2], Kokkos::Experimental::OpenMPTarget>' requested here
+  deep_copy(mirror, src);
+  ^
+main.cpp:65:28: note: in instantiation of function template specialization 'Kokkos::create_mirror_view_and_copy<Kokkos::HostSpace, int[2], Kokkos::Experimental::OpenMPTarget>' requested here
+        auto h_v = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace(), v);
+                           ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_device_functions.h:38:36: note: used here
+__DEVICE__ void __brkpt(int __a) { __brkpt(); }
+                                   ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_device_functions.h:1189:22: note: used here
+  return __bool2mask(__vseteq2(__a, __b), 16);
+                     ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_device_functions.h:1189:10: note: used here
+  return __bool2mask(__vseteq2(__a, __b), 16);
+         ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_device_functions.h:1199:22: note: used here
+  return __bool2mask(__vseteq4(__a, __b), 8);
+                     ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_device_functions.h:1209:22: note: used here
+  return __bool2mask(__vsetges2(__a, __b), 16);
+                     ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_device_functions.h:1219:22: note: used here
+  return __bool2mask(__vsetges4(__a, __b), 8);
+                     ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_device_functions.h:1229:22: note: used here
+  return __bool2mask(__vsetgeu2(__a, __b), 16);
+                     ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_device_functions.h:1239:22: note: used here
+  return __bool2mask(__vsetgeu4(__a, __b), 8);
+                     ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_device_functions.h:1249:22: note: used here
+  return __bool2mask(__vsetgts2(__a, __b), 16);
+                     ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_device_functions.h:1259:22: note: used here
+  return __bool2mask(__vsetgts4(__a, __b), 8);
+                     ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_device_functions.h:1269:22: note: used here
+  return __bool2mask(__vsetgtu2(__a, __b), 16);
+                     ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_device_functions.h:1279:22: note: used here
+  return __bool2mask(__vsetgtu4(__a, __b), 8);
+                     ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_device_functions.h:1289:22: note: used here
+  return __bool2mask(__vsetles2(__a, __b), 16);
+                     ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_device_functions.h:1299:22: note: used here
+  return __bool2mask(__vsetles4(__a, __b), 8);
+                     ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_device_functions.h:1309:22: note: used here
+  return __bool2mask(__vsetleu2(__a, __b), 16);
+                     ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_device_functions.h:1319:22: note: used here
+  return __bool2mask(__vsetleu4(__a, __b), 8);
+                     ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_device_functions.h:1329:22: note: used here
+  return __bool2mask(__vsetlts2(__a, __b), 16);
+                     ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_device_functions.h:1339:22: note: used here
+  return __bool2mask(__vsetlts4(__a, __b), 8);
+                     ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_device_functions.h:1349:22: note: used here
+  return __bool2mask(__vsetltu2(__a, __b), 16);
+                     ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_device_functions.h:1359:22: note: used here
+  return __bool2mask(__vsetltu4(__a, __b), 8);
+                     ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_device_functions.h:1369:22: note: used here
+  return __bool2mask(__vsetne2(__a, __b), 16);
+                     ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_device_functions.h:1379:22: note: used here
+  return __bool2mask(__vsetne4(__a, __b), 8);
+                     ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_device_functions.h:1399:21: note: used here
+    unsigned mask = __vcmpgts2(__a, __b);
+                    ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_device_functions.h:1493:60: note: used here
+__DEVICE__ unsigned int __vneg2(unsigned int __a) { return __vsub2(0, __a); }
+                                                           ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_device_functions.h:1502:60: note: used here
+__DEVICE__ unsigned int __vneg4(unsigned int __a) { return __vsub4(0, __a); }
+                                                           ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_device_functions.h:1511:10: note: used here
+  return __vsubss2(0, __a);
+         ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_device_functions.h:1521:10: note: used here
+  return __vsubss4(0, __a);
+         ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_math.h:187:44: note: used here
+__DEVICE__ long lrintf(float __a) { return __float2ll_rn(__a); }
+                                           ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_cmath.h:90:44: note: used here
+__DEVICE__ int isinf(float __x) { return ::__isinff(__x); }
+                                           ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_cmath.h:91:45: note: used here
+__DEVICE__ int isinf(double __x) { return ::__isinf(__x); }
+                                            ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_cmath.h:92:47: note: used here
+__DEVICE__ int isfinite(float __x) { return ::__finitef(__x); }
+                                              ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_cmath.h:93:48: note: used here
+__DEVICE__ int isfinite(double __x) { return ::__isfinited(__x); }
+                                               ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_cmath.h:94:44: note: used here
+__DEVICE__ int isnan(float __x) { return ::__isnanf(__x); }
+                                           ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_cmath.h:95:45: note: used here
+__DEVICE__ int isnan(double __x) { return ::__isnan(__x); }
+                                            ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_cmath.h:165:12: note: used here
+  return ::powif(__base, __iexp);
+           ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_cmath.h:168:12: note: used here
+  return ::powi(__base, __iexp);
+           ^
+/global/cfs/cdirs/m1759/rgayatri/software/llvm/14/lib/clang/14.0.1/include/__clang_cuda_cmath.h:171:48: note: used here
+__DEVICE__ bool signbit(double __x) { return ::__signbitd(__x); }
+                                               ^
+12 warnings generated.
+clang++ -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70 -DKOKKOS_WORKAROUND_OPENMPTARGET_CLANG -fopenmp -fopenmp=libomp --cuda-path=/usr/common/software/sles15_cgpu/cuda/11.2.1 -L/global/u1/r/rgayatri/Kokkos/kokkos-openmptarget-examples/Scratch   main.o -lkokkos -ldl -latomic -lomptarget  -o test.ompt
+echo "Start Build"
+Start Build
