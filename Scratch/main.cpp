@@ -7,6 +7,21 @@ using ScratchSpace = ExecSpace::scratch_memory_space;
 using scratch_view_type =
     Kokkos::View<int*, ScratchSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
 
+// FIXME - Something similar to this should be in the OpenMPTarget backend of
+// Kokkos to request specific amount of scratch memory to the OpenMP runtime.
+namespace Kokkos {
+namespace Impl {
+
+inline void* get_dynamic_shared() { return NULL; }
+#pragma omp begin declare variant match(device = {arch(nvptx64)})
+extern "C" void* __kmpc_get_dynamic_shared();
+inline void* get_dynamic_shared() {
+    return llvm_omp_target_dynamic_shared_alloc();
+}
+#pragma omp end declare variant
+}  // namespace Impl
+}  // namespace Kokkos
+
 int main(int argc, char** argv) {
     Kokkos::initialize(argc, argv);
     {
