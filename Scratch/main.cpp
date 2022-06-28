@@ -14,7 +14,7 @@ namespace Impl {
 
 inline void* get_dynamic_shared() { return NULL; }
 #pragma omp begin declare variant match(device = {arch(nvptx64)})
-extern "C" void* __kmpc_get_dynamic_shared();
+extern "C" void* llvm_omp_target_dynamic_shared_alloc();
 inline void* get_dynamic_shared() {
     return llvm_omp_target_dynamic_shared_alloc();
 }
@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
 
         Kokkos::View<int[2], ExecSpace> v("v");
 
-#ifdef KOKKOS_ENABLE_OPENMPTARGET
+#if defined(KOKKOS_ENABLE_OPENMPTARGET)
 
         int x[2];
 
