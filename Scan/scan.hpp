@@ -79,7 +79,7 @@ struct SCAN {
         for (int i = 0; i < N; ++i) {
             if (check != h_b(i)) {
                 printf(
-                    "Failed correctness: expected check = %d, got a(%d) = %d\n",
+                    "RangePolicy: Failed correctness: expected check = %d, got a(%d) = %d\n",
                     check, i, h_b(i));
                 pass = false;
             }
@@ -112,7 +112,7 @@ struct SCAN {
             for (int j = 0; j < team_size; ++j) {
                 if (check != h_d(i, j)) {
                     printf(
-                        "Failed correctness: expected check = %d, got d(%d,%d) "
+                        "TeamPolicy: Failed correctness: expected check = %d, got d(%d,%d) "
                         "= %d\n",
                         check, i, j, h_d(i, j));
                     pass = false;

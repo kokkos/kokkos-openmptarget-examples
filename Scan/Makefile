@@ -1,4 +1,5 @@
-KOKKOS_PATH = ${KOKKOS}/rgayatri-kokkos
+#KOKKOS_PATH = ${KOKKOS}/lammps-kokkos
+KOKKOS_PATH = ${HOME}/Kokkos/rgayatri-kokkos
 SRC = $(wildcard *.cpp)
 vpath %.cpp $(sort $(dir $(SRC)))
 HEADER=scan.hpp
@@ -23,12 +24,13 @@ EXE = test.ompt
 KOKKOS_DEVICES = "OpenMPTarget"
 KOKKOS_ARCH = "Volta70"
 KOKKOS_CXX_STANDARD=c++17
-CXXFLAGS += -Wno-unknown-cuda-version -Wno-undefined-internal -Wno-pass-failed -Wno-openmp-mapping -Wno-extra-tokens
-CXXFLAGS += -fopenmp-cuda-mode
+#CXXFLAGS += --gcc-toolchain=/global/cfs/cdirs/m1759/rgayatri/software/GCC/gcc-10.2/install
+#CXXFLAGS += -Wno-unknown-cuda-version -Wno-undefined-internal -Wno-pass-failed -Wno-openmp-mapping -Wno-extra-tokens
+#CXXFLAGS += -fopenmp-cuda-mode
 LINK = ${CXX}
 LDFLAGS =-Wno-unknown-cuda-version
-CXXFLAGS += $(LLVM_CFLAGS)
-LDFLAGS += $(LLVM_CFLAGS)
+#CXXFLAGS += $(LLVM_CFLAGS)
+#LDFLAGS += $(LLVM_CFLAGS)
 endif
 
 DEPFLAGS = -M
@@ -47,7 +49,7 @@ $(EXE): $(OBJ) $(KOKKOS_LINK_DEPENDS)
 	$(LINK) $(KOKKOS_LDFLAGS) $(LDFLAGS) $(EXTRA_PATH) $(OBJ) $(KOKKOS_LIBS) $(LIB) -o $(EXE)
 
 clean: kokkos-clean 
-	rm -f *.o *.cuda *.host
+	rm -f *.o *.ompt *.cuda *.host
 
 # Compilation rules
 
