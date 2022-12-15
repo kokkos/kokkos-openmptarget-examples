@@ -1,4 +1,4 @@
-KOKKOS_PATH = ${HOME}/Kokkos/kokkos
+KOKKOS_PATH = ${SCRATCH}/Kokkos/kokkos-3.7.01
 SRC = $(wildcard *.cpp)
 KOKKOS_DEVICES=OpenMPTarget
 KOKKOS_CUDA_OPTIONS=enable_lambda
@@ -10,6 +10,8 @@ default: build
 CXX = clang++
 EXE = test.ompt
 KOKKOS_CXX_STANDARD=c++17
+
+HEADERS=axpy.hpp
 
 CXXFLAGS = -O3 -g
 
@@ -35,5 +37,5 @@ clean: kokkos-clean
 
 # Compilation rules
 
-%.o:%.cpp $(KOKKOS_CPP_DEPENDS)
+%.o:%.cpp $(HEADERS) $(KOKKOS_CPP_DEPENDS)
 	$(CXX) $(KOKKOS_CPPFLAGS) $(KOKKOS_CXXFLAGS) $(CXXFLAGS) $(EXTRA_INC) -c $<

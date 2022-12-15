@@ -137,6 +137,7 @@ struct AXPBY {
     double bytes_moved = 1. * sizeof(double) * N * 3 * R;
     double GB = bytes_moved / 1024 / 1024 / 1024;
     double time_kk = kk_axpby(R);
+    printf("\n Bytes moved[GBs] = %f\n",GB);
     printf("AXPBY KK: %e s %e GB/s\n", time_kk, GB / time_kk);
 #ifdef KOKKOS_ENABLE_OPENMPTARGET
     double time_ompt = ompt_axpby(R);
