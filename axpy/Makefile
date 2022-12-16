@@ -1,14 +1,13 @@
 KOKKOS_PATH = ${SCRATCH}/Kokkos/kokkos-3.7.01
 SRC = $(wildcard *.cpp)
 KOKKOS_DEVICES=OpenMPTarget
-KOKKOS_CUDA_OPTIONS=enable_lambda
-KOKKOS_ARCH = Volta70
+KOKKOS_ARCH = Ampere80
 
 default: build
 	echo "Start Build"
 
 CXX = clang++
-EXE = test.ompt
+EXE = axpy.ompt
 KOKKOS_CXX_STANDARD=c++17
 
 HEADERS=axpy.hpp
