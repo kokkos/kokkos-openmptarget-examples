@@ -1,4 +1,4 @@
-KOKKOS_PATH=/gpfs/alpine/mat187/scratch/rgayatri/Kokkos/kokkos-4.0
+KOKKOS_PATH=$(SCRATCH)/Kokkos/kokkos-4.0
 SRC = $(wildcard *.cpp)
 KOKKOS_CXX_STANDARD=c++17
 
@@ -14,15 +14,12 @@ ifeq ($(backend), cuda)
     CXX = $(KOKKOS_PATH)/bin/nvcc_wrapper
     KOKKOS_CUDA_OPTIONS += "enable_lambda"
     KOKKOS_DEVICES = "Cuda"
-    ex = cuda
 else ifeq ($(backend), hip)
     CXX = hipcc
     KOKKOS_DEVICES = "HIP"
-    ex = hip
 else ifeq ($(backend), ompt)
     KOKKOS_DEVICES = "OpenMPTarget"
     OFFLOAD_FLAGS = -fopenmp
-    ex=ompt
     ifeq ($(comp), clang)
         CXX = clang++
         ifeq ($(arch), A100)

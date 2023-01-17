@@ -5,7 +5,7 @@ HEADER = cgsolve.hpp generate_matrix.hpp
 default: build
 	echo "Start Build"
 
-EXE = cgsolve.${ex}
+EXE = cgsolve.${backend}
 
 CXXFLAGS = -O3 -g
 
