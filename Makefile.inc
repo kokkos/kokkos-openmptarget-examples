@@ -7,7 +7,7 @@ OFFLOAD_FLAGS =
 ifeq ($(arch), A100)
     KOKKOS_ARCH=Ampere80
 else ifeq ($(arch), MI250x)
-    KOKKOS_ARCH=Vega90a
+    KOKKOS_ARCH=Vega90A
 endif
 
 ifeq ($(backend), cuda)
