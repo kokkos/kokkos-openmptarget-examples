@@ -40,6 +40,12 @@ struct point {
     }
 
     KOKKOS_INLINE_FUNCTION
+    point(const point &&src) {
+        x = src.x;
+        y = src.y;
+    }
+
+    KOKKOS_INLINE_FUNCTION
     point &operator=(const point &src) {
         x = src.x;
         y = src.y;
@@ -49,14 +55,14 @@ struct point {
 
     KOKKOS_INLINE_FUNCTION
     bool operator>(const point &src) const {
-        if (src.x > x && src.y > y) return true;
+        if (src.x < x && src.y < y) return true;
 
         return false;
     }
 
     KOKKOS_INLINE_FUNCTION
     bool operator<(const point &src) const {
-        if (src.x < x && src.y < y) return true;
+        if (src.x > x && src.y > y) return true;
 
         return false;
     }
@@ -72,10 +78,12 @@ struct point {
 
 namespace Kokkos {
 template <>
-struct reduction_identity<struct point> {
-    KOKKOS_FORCEINLINE_FUNCTION static point sum() { return point(); }
-    KOKKOS_FORCEINLINE_FUNCTION static point min() { return point(); }
-    KOKKOS_FORCEINLINE_FUNCTION static point max() { return point(); }
+struct reduction_identity<point> {
+    KOKKOS_FORCEINLINE_FUNCTION static point sum() { return point(0, 0); }
+    KOKKOS_FORCEINLINE_FUNCTION static point min() {
+        return point(INT_MAX, INT_MAX);
+    }
+    KOKKOS_FORCEINLINE_FUNCTION static point max() { return point(0, 0); }
 };
 }  // namespace Kokkos
 
@@ -153,10 +161,15 @@ struct custom_reduction {
 #endif
 
     void find_enclosing_rectangle_kk() {
-        struct point minp = point{INT_MAX, INT_MAX}, maxp = {0, 0},
-                     sump = {0, 0};
+        point minp = point{INT_MAX, INT_MAX}, maxp = point(0, 0), sump = {0, 0};
         Kokkos::RangePolicy<ExecSpace> policy(0, N);
 
+        Kokkos::parallel_reduce(
+            "kk_parallel_reduce_sum", policy,
+            KOKKOS_CLASS_LAMBDA(const int i, point &lsum) {
+                lsum += d_points(i);
+            },
+            sump);
         Kokkos::parallel_reduce(
             "kk_parallel_reduce_sum", policy,
             KOKKOS_CLASS_LAMBDA(const int i, point &lsum) {
@@ -169,7 +182,7 @@ struct custom_reduction {
         Kokkos::parallel_reduce(
             "kk_parallel_reduce_min", policy,
             KOKKOS_CLASS_LAMBDA(const int i, point &lmin) {
-                if (lmin < d_points(i)) lmin = d_points(i);
+                if (lmin > d_points(i)) lmin = d_points(i);
             },
             Kokkos::Min<point>(minp));
 
@@ -178,9 +191,7 @@ struct custom_reduction {
         Kokkos::parallel_reduce(
             "kk_parallel_reduce_max", policy,
             KOKKOS_CLASS_LAMBDA(const int i, point &lmax) {
-                if (lmax > d_points(i)) {
-                    lmax = d_points(i);
-                }
+                if (lmax < d_points(i)) lmax = d_points(i);
             },
             Kokkos::Max<point>(maxp));
 
