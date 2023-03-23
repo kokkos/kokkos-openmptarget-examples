@@ -5,7 +5,7 @@ HEADER = custom_reduction.hpp
 default: build
 	echo "Start Build"
 
-EXE = cgsolve.${backend}
+EXE = custom_redn.${backend}
 
 CXXFLAGS = -O3 -g
 

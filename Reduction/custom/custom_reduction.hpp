@@ -28,26 +28,56 @@ struct point {
     int y;
 
     KOKKOS_INLINE_FUNCTION
-    point() : x(0),y(0) {;}
+    point() : x(0), y(0) { ; }
 
     KOKKOS_INLINE_FUNCTION
-    point(int x_, int y_) : x(x_),y(y_) {;}
+    point(int x_, int y_) : x(x_), y(y_) { ; }
 
     KOKKOS_INLINE_FUNCTION
-    point(const point &src)
-    {
-        x = src.x ;
-        y = src.y ;
+    point(const point &src) {
+        x = src.x;
+        y = src.y;
     }
 
     KOKKOS_INLINE_FUNCTION
-    point& operator+=(const struct point &lsum) {
-        x += lsum.x;
-        y += lsum.y;
+    point &operator=(const point &src) {
+        x = src.x;
+        y = src.y;
+
+        return *this;
+    }
+
+    KOKKOS_INLINE_FUNCTION
+    bool operator>(const point &src) const {
+        if (src.x > x && src.y > y) return true;
+
+        return false;
+    }
+
+    KOKKOS_INLINE_FUNCTION
+    bool operator<(const point &src) const {
+        if (src.x < x && src.y < y) return true;
+
+        return false;
+    }
+
+    KOKKOS_INLINE_FUNCTION
+    point &operator+=(const point &src) {
+        x += src.x;
+        y += src.y;
 
         return *this;
     }
 };
+
+namespace Kokkos {
+template <>
+struct reduction_identity<struct point> {
+    KOKKOS_FORCEINLINE_FUNCTION static point sum() { return point(); }
+    KOKKOS_FORCEINLINE_FUNCTION static point min() { return point(); }
+    KOKKOS_FORCEINLINE_FUNCTION static point max() { return point(); }
+};
+}  // namespace Kokkos
 
 struct custom_reduction {
     int N;
@@ -65,16 +95,19 @@ struct custom_reduction {
           h_points(h_view("h_points", N)),
           d_points(d_view("d_points", N)) {}
 
+    KOKKOS_INLINE_FUNCTION
     static void minproc(struct point *out, struct point *in) {
         if (in->x < out->x) out->x = in->x;
         if (in->y < out->y) out->y = in->y;
     }
 
+    KOKKOS_INLINE_FUNCTION
     static void maxproc(struct point *out, struct point *in) {
         if (in->x > out->x) out->x = in->x;
         if (in->y > out->y) out->y = in->y;
     }
 
+    KOKKOS_INLINE_FUNCTION
     static void addproc(struct point *out, struct point *in) {
         out->x += in->x;
         out->y += in->y;
@@ -120,24 +153,46 @@ struct custom_reduction {
 #endif
 
     void find_enclosing_rectangle_kk() {
+        struct point minp = point{INT_MAX, INT_MAX}, maxp = {0, 0},
+                     sump = {0, 0};
+        Kokkos::RangePolicy<ExecSpace> policy(0, N);
 
-        struct point sum = point(0,0);
-        Kokkos::RangePolicy<ExecSpace> policy(0,N);
-
-        // DEBUG - I am needing to use this indirection to access d_points view inside the parallel_reduce.
-        // Additionally I also have issues with replacing the += on struct with Kokkos::Sum. 
-        struct point* d_ptr = d_points.data();
         Kokkos::parallel_reduce(
-            "kk_parallel_reduce", policy, 
-            KOKKOS_LAMBDA(const int i, struct point &lsum) {
-                lsum += d_ptr[i];
-            }, sum);
+            "kk_parallel_reduce_sum", policy,
+            KOKKOS_CLASS_LAMBDA(const int i, point &lsum) {
+                lsum += d_points(i);
+            },
+            Kokkos::Sum<point>(sump));
 
         Kokkos::fence();
 
-        printf("Kokkos - %s\n",  typeid(ExecSpace).name());
-        printf("sum : result = (%d, %d),   expected = (%d, %d)\n", sum.x,
-               sum.y, N * (N + 1) / 2, N * (N + 3) / 2);
+        Kokkos::parallel_reduce(
+            "kk_parallel_reduce_min", policy,
+            KOKKOS_CLASS_LAMBDA(const int i, point &lmin) {
+                if (lmin < d_points(i)) lmin = d_points(i);
+            },
+            Kokkos::Min<point>(minp));
+
+        Kokkos::fence();
+
+        Kokkos::parallel_reduce(
+            "kk_parallel_reduce_max", policy,
+            KOKKOS_CLASS_LAMBDA(const int i, point &lmax) {
+                if (lmax > d_points(i)) {
+                    lmax = d_points(i);
+                }
+            },
+            Kokkos::Max<point>(maxp));
+
+        Kokkos::fence();
+
+        printf("Kokkos - %s\n", typeid(ExecSpace).name());
+        printf("min : result = (%d, %d),   expected = (%d, %d)\n", minp.x,
+               minp.y, 1, 2);
+        printf("max : result = (%d, %d),   expected = (%d, %d)\n", maxp.x,
+               maxp.y, N, N + 1);
+        printf("sum : result = (%d, %d),   expected = (%d, %d)\n", sump.x,
+               sump.y, N * (N + 1) / 2, N * (N + 3) / 2);
         printf("\n");
     }
 
