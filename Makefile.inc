@@ -1,8 +1,9 @@
-KOKKOS_PATH=$(SCRATCH)/Kokkos/kokkos-4.0
+KOKKOS_PATH=$(SCRATCH)/Kokkos/kokkos-4.0.01
 SRC = $(wildcard *.cpp)
 KOKKOS_CXX_STANDARD=c++17
 
-OFFLOAD_FLAGS =
+OFFLOAD_FLAGS ?= -fopenmp
+arch ?= A100
 
 ifeq ($(arch), A100)
     KOKKOS_ARCH=Ampere80
@@ -11,9 +12,15 @@ else ifeq ($(arch), MI250x)
 endif
 
 ifeq ($(backend), cuda)
-    CXX = $(KOKKOS_PATH)/bin/nvcc_wrapper
-    KOKKOS_CUDA_OPTIONS += "enable_lambda"
-    KOKKOS_DEVICES = "Cuda"
+    ifeq ($(comp), clang)
+        CXX = clang++
+        KOKKOS_CUDA_OPTIONS += "enable_lambda"
+        KOKKOS_DEVICES = "Cuda"
+    else
+        CXX = $(KOKKOS_PATH)/bin/nvcc_wrapper
+        KOKKOS_CUDA_OPTIONS += "enable_lambda"
+        KOKKOS_DEVICES = "Cuda"
+    endif
 else ifeq ($(backend), hip)
     CXX = hipcc
     KOKKOS_DEVICES = "HIP"
@@ -31,6 +38,9 @@ else ifeq ($(backend), ompt)
         KOKKOS_OPTIONS += KOKKOS_INTERNAL_DISABLE_DESUL_ATOMICS
         CXX = nvc++
         OFFLOAD_FLAGS = -mp=gpu -gpu=cc80
+    else ifeq ($(comp), cce)
+        CXX = CC
+        OFFLOAD_FLAGS =
     else ifeq ($(comp), rocmclang)
         CXX = amdclang++
         OFFLOAD_FLAGS += -target x86_64-pc-linux-gnu -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx90a
