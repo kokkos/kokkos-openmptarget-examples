@@ -8,6 +8,8 @@ ifeq ($(arch), A100)
     KOKKOS_ARCH=Ampere80
 else ifeq ($(arch), MI250x)
     KOKKOS_ARCH=Vega90A
+else ifeq ($(arch), PVC)
+    KOKKOS_ARCH=INTEL_PVC
 endif
 
 ifeq ($(backend), cuda)
@@ -17,6 +19,9 @@ ifeq ($(backend), cuda)
 else ifeq ($(backend), hip)
     CXX = hipcc
     KOKKOS_DEVICES = "HIP"
+else ifeq ($(backend), sycl)
+    CXX = icpx
+    KOKKOS_DEVICES = "SYCL"
 else ifeq ($(backend), ompt)
     KOKKOS_DEVICES = "OpenMPTarget"
     OFFLOAD_FLAGS = -fopenmp
@@ -34,5 +39,8 @@ else ifeq ($(backend), ompt)
     else ifeq ($(comp), rocmclang)
         CXX = amdclang++
         OFFLOAD_FLAGS += -target x86_64-pc-linux-gnu -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx90a
+    else ifeq ($(comp), icpx)
+        CXX = icpx 
+	OFFLOAD_FLAGS += -Xclang -fopenmp-use-host-usm-for-implicit-reduction-map
     endif
 endif

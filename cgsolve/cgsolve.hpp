@@ -50,14 +50,20 @@ struct cgsolve {
 
     template <class YType, class AType, class XType>
     void spmv(YType y, AType A, XType x) {
-#if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP)
+#if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP) || defined(KOKKOS_ENABLE_SYCL)
+        int rows_per_team = 16;
+        int team_size = 16;
+        int vector_size = 8;
+#elif defined(KOKKOS_ENABLE_OPENMPTARGET)
+#if defined(KOKKOS_ARCH_INTEL_GPU)
         int rows_per_team = 16;
         int team_size = 16;
         int vector_size = 1;
-#elif defined(KOKKOS_ENABLE_OPENMPTARGET)
+#else
         int rows_per_team = 32;
         int team_size = 32;
         int vector_size = 1;
+#endif
 #else
         int rows_per_team = 512;
         int team_size = 1;
