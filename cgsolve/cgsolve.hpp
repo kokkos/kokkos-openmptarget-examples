@@ -50,21 +50,30 @@ struct cgsolve {
 
     template <class YType, class AType, class XType>
     void spmv(YType y, AType A, XType x) {
-#if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP)
+#if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP) || defined(KOKKOS_ENABLE_SYCL)
         int rows_per_team = 16;
         int team_size = 16;
+        int vector_size = 8;
 #elif defined(KOKKOS_ENABLE_OPENMPTARGET)
+#if defined(KOKKOS_ARCH_INTEL_GPU)
+        int rows_per_team = 16;
+        int team_size = 16;
+        int vector_size = 1;
+#else
         int rows_per_team = 32;
         int team_size = 32;
+        int vector_size = 1;
+#endif
 #else
         int rows_per_team = 512;
         int team_size = 1;
+        int vector_size = 1;
 #endif
         int64_t nrows = y.extent(0);
         Kokkos::parallel_for(
             "SPMV",
             Kokkos::TeamPolicy<>((nrows + rows_per_team - 1) / rows_per_team,
-                                 team_size, 8),
+                                 team_size, vector_size),
             KOKKOS_LAMBDA(const Kokkos::TeamPolicy<>::member_type &team) {
                 const int64_t first_row = team.league_rank() * rows_per_team;
                 const int64_t last_row = first_row + rows_per_team < nrows
