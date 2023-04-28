@@ -55,7 +55,7 @@ struct AXPBY {
         int N_ = N;
 
 // Warmup
-#pragma omp target teams distribute parallel for simd data map(to : f, N_)
+#pragma omp target teams distribute parallel for simd map(to : f, N_)
         for (int i = 0; i < N_; i++) {
             f(i);
         }
@@ -64,7 +64,7 @@ struct AXPBY {
         Kokkos::Timer timer;
 
         for (int r = 0; r < R; r++) {
-#pragma omp target teams distribute parallel for simd data map(to : f, N_)
+#pragma omp target teams distribute parallel for simd map(to : f, N_)
             for (int i = 0; i < N_; i++) {
                 f(i);
             }
@@ -84,7 +84,7 @@ struct AXPBY {
 
 // Warmup
 #pragma omp target teams distribute parallel for simd is_device_ptr( \
-        xp, yp, zp) data                                             \
+        xp, yp, zp) \
 map(to : N_)
         for (int i = 0; i < N_; i++) {
             zp[i] = xp[i] + yp[i];
@@ -94,7 +94,7 @@ map(to : N_)
         Kokkos::Timer timer;
         for (int r = 0; r < R; r++) {
 #pragma omp target teams distribute parallel for simd is_device_ptr( \
-        xp, yp, zp) data                                             \
+        xp, yp, zp) \
 map(to : N_)
             for (int i = 0; i < N_; i++) {
                 zp[i] = xp[i] + yp[i];
