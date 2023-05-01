@@ -1,22 +1,17 @@
-KOKKOS_PATH = ${HOME}/Kokkos/kokkos
-SRC = $(wildcard *.cpp)
-KOKKOS_DEVICES=OpenMPTarget
-KOKKOS_CUDA_OPTIONS=enable_lambda
-KOKKOS_ARCH = Volta70
+include ../Makefile.inc
+
+HEADER = dot.hpp
 
 default: build
 	echo "Start Build"
 
-CXX = clang++
-EXE = test.ompt
-KOKKOS_CXX_STANDARD=c++17
+EXE = dot.${backend}
 
 CXXFLAGS = -O3 -g
 
-# To avoid warnings
-CXXFLAGS += -Wno-unknown-cuda-version -Wno-undefined-internal -Wno-pass-failed -Wno-openmp-mapping -Wno-extra-tokens
-LINK = ${CXX}
-LINKFLAGS =-Wno-unknown-cuda-version
+CXXFLAGS += ${OFFLOAD_FLAGS}
+
+LINK = ${CXX} ${CXXFLAGS}
 
 DEPFLAGS = -M
 
@@ -28,12 +23,12 @@ include $(KOKKOS_PATH)/Makefile.kokkos
 build: $(EXE)
 
 $(EXE): $(OBJ) $(KOKKOS_LINK_DEPENDS)
-	$(LINK) $(KOKKOS_LDFLAGS) $(LINKFLAGS) $(EXTRA_PATH) $(OBJ) $(KOKKOS_LIBS) $(LIB) -o $(EXE)
+	$(LINK) $(KOKKOS_LDFLAGS) $(EXTRA_PATH) $(OBJ) $(KOKKOS_LIBS) $(LIB) -o $(EXE)
 
 clean: kokkos-clean
-	rm -f *.o *.cuda *.host *.ompt
+	rm -f *.o *.ompt *.cuda *.host *.openmp *.hip
 
 # Compilation rules
 
-%.o:%.cpp $(KOKKOS_CPP_DEPENDS)
+%.o:%.cpp $(KOKKOS_CPP_DEPENDS) $(HEADER)
 	$(CXX) $(KOKKOS_CPPFLAGS) $(KOKKOS_CXXFLAGS) $(CXXFLAGS) $(EXTRA_INC) -c $<

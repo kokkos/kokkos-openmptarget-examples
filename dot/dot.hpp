@@ -50,7 +50,7 @@ struct DOT {
     int N_ = N;
     // Warmup
     double result = 0.;
-#pragma omp target teams distribute parallel for simd data map(to: f, N_) reduction(+:result)
+#pragma omp target teams distribute parallel for simd map(to: f, N_) reduction(+:result)
     for (int i = 0; i < N_; i++) {
       f(i, result);
     }
@@ -58,7 +58,7 @@ struct DOT {
 
     Kokkos::Timer timer;
     for (int r = 0; r < R; r++) {
-#pragma omp target teams distribute parallel for simd data map(to: f, N_) reduction(+:result)
+#pragma omp target teams distribute parallel for simd map(to: f, N_) reduction(+:result)
       for (int i = 0; i < N_; i++) {
         f(i, result);
       }
@@ -83,7 +83,7 @@ struct DOT {
     // Warmup
     double result = 0.;
 #pragma omp target teams distribute parallel for \
-      simd is_device_ptr(xp,yp) data map(to: N_) reduction(+:result)
+      simd is_device_ptr(xp,yp) map(to: N_) reduction(+:result)
     for (int i = 0; i < N_; i++) {
       result += xp[i] * yp[i];
     }
@@ -92,7 +92,7 @@ struct DOT {
     Kokkos::Timer timer;
     for (int r = 0; r < R; r++) {
 #pragma omp target teams distribute parallel for \
-        simd is_device_ptr(xp,yp,zp) data map(to: N_) reduction(+:result)
+        simd is_device_ptr(xp,yp,zp) map(to: N_) reduction(+:result)
       for (int i = 0; i < N_; i++) {
         result += xp[i] * yp[i];
       }
