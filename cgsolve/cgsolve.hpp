@@ -388,6 +388,9 @@ struct cgsolve {
         double dot_bytes = x.extent(0) * sizeof(double) * 2;
         double axpby_bytes = x.extent(0) * sizeof(double) * 3;
 
+        double GB = (spmv_bytes + dot_bytes + axpby_bytes) / 1024 / 1024 / 1024;
+        printf("Data Transferred = %f GBs\n", GB);
+
         double spmv_flops = A.nnz() * 2;
         double dot_flops = x.extent(0) * 2;
         double axpby_flops = x.extent(0) * 3;
