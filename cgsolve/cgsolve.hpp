@@ -49,8 +49,9 @@ struct cgsolve {
     }
 
     template <class YType, class AType, class XType>
-    void spmv(YType y, AType A, XType x) {
-#if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP) || defined(KOKKOS_ENABLE_SYCL)
+    double spmv(YType y, AType A, XType x) {
+#if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP) || \
+    defined(KOKKOS_ENABLE_SYCL)
         int rows_per_team = 16;
         int team_size = 16;
         int vector_size = 8;
@@ -70,6 +71,7 @@ struct cgsolve {
         int vector_size = 1;
 #endif
         int64_t nrows = y.extent(0);
+        Kokkos::Timer timer;
         Kokkos::parallel_for(
             "SPMV",
             Kokkos::TeamPolicy<>((nrows + rows_per_team - 1) / rows_per_team,
@@ -97,6 +99,11 @@ struct cgsolve {
                         y(row) = y_row;
                     });
             });
+
+        Kokkos::fence();
+        double time = timer.seconds();
+
+        return time;
     }
 
 #if defined(KOKKOS_ENABLE_OPENMPTARGET)
@@ -226,6 +233,8 @@ struct cgsolve {
         double rtrans = 0;
         double oldrtrans = 0;
 
+        double spmv_time = 0.;
+
         int64_t print_freq = max_iter / 10;
         if (print_freq > 50) print_freq = 50;
         if (print_freq < 1) print_freq = 1;
@@ -237,7 +246,7 @@ struct cgsolve {
         double zero = 0.0;
         axpby(p, one, x, zero, x);
 
-        spmv(Ap, A, p);
+        spmv_time += spmv(Ap, A, p);
         axpby(r, one, b, -one, Ap);
 
 #if defined(KOKKOS_ENABLE_OPENMPTARGET) && defined(KOKKOS_ARCH_VEGA90A)
@@ -273,7 +282,7 @@ struct cgsolve {
             double alpha = 0;
             double p_ap_dot = 0;
 
-            spmv(Ap, A, p);
+            spmv_time += spmv(Ap, A, p);
 
             p_ap_dot = dot(Ap, p);
 
@@ -291,6 +300,20 @@ struct cgsolve {
             axpby(r, one, r, -alpha, Ap);
             num_iters = k;
         }
+
+        // Compute SPMV Bytes and Flops
+        double spmv_bytes =
+            A.num_rows() * sizeof(int64_t) + A.nnz() * sizeof(int64_t) +
+            A.nnz() * sizeof(double) + A.nnz() * sizeof(double) +
+            A.num_rows() * sizeof(double);
+        double spmv_flops = A.nnz() * 2;
+
+        double GB = (spmv_bytes) / 1024 / 1024 / 1024;
+        printf("KK: SPMV Performance: %lf GFlop/s %lf GB/s \n",
+               1e-9 * (spmv_flops * (num_iters + 1)) / spmv_time,
+               (1.0 / 1024 / 1024 / 1024) * (spmv_bytes * (num_iters + 1)) /
+                   spmv_time);
+
         return num_iters;
     }
 
