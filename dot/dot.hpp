@@ -21,10 +21,12 @@ struct DOT {
   using view_t = Kokkos::View<double *>;
   int N;
   view_t x, y, z;
+  double* x_data;
+  double* y_data;
 
   bool fence_all;
   DOT(int N_, bool fence_all_)
-      : N(N_), x(view_t("X", N)), y(view_t("Y", N)), fence_all(fence_all_) {}
+      : N(N_), x(view_t("X", N)), y(view_t("Y", N)), x_data(x.data()), y_data(y.data()), fence_all(fence_all_) {}
 
   KOKKOS_FUNCTION
   void operator()(int i, double &lsum) const { lsum += x(i) * y(i); }
@@ -32,17 +34,55 @@ struct DOT {
   double kk_dot(int R) {
     // Warmup
     double result;
-    Kokkos::parallel_reduce("kk_dot_wup", N, *this, result);
+    auto x_data_ = x_data;
+    auto y_data_ = y_data;
+    Kokkos::parallel_reduce("kk_dot_wup", N, KOKKOS_LAMBDA(int i, double& lsum) {lsum += x_data_[i]*y_data_[i];}, result);
     Kokkos::fence();
 
     Kokkos::Timer timer;
     for (int r = 0; r < R; r++) {
-      Kokkos::parallel_reduce("kk_dot", N, *this, result);
+      Kokkos::parallel_reduce("kk_wup", N, KOKKOS_LAMBDA(int i, double& lsum) {for (unsigned int j=0; j<1; ++j) {lsum += x_data_[i]*y_data_[i];}}, result);
     }
     Kokkos::fence();
     double time = timer.seconds();
     return time;
   }
+
+  #ifdef KOKKOS_ENABLE_SYCL
+  double sycl_dot(int R) {
+    DOT f(*this);
+    int N_ = N;
+    sycl::queue q;
+    auto x_data_ = x_data;
+    auto y_data_ = y_data;
+    // Warmup
+    double* result = sycl::malloc_device<double>(1, q);
+    q.submit([&](sycl::handler& cgh) {
+		    cgh.parallel_for(sycl::range<1>(N_), sycl::reduction(result, 0., sycl::plus<double>()),
+				    [=](sycl::id<1> idx, auto&sum) {
+				    int i = idx;
+				    sum += x_data_[i]*y_data_[i];
+						    });});
+    q.wait();
+
+    Kokkos::Timer timer;
+    for (int r = 0; r < R; r++) {
+      q.submit([&](sycl::handler& cgh) {
+                    cgh.parallel_for(sycl::range<1>(N_), sycl::reduction(result, 0., sycl::plus<double>()),
+                                    [=](sycl::id<1> idx, auto&sum) {
+				    for (unsigned int j=0; j<1; ++j) {
+                                    int i = idx;
+				    sum += x_data_[i]*y_data_[i];
+				    }
+                                                    });});
+      q.wait();
+    }
+    q.wait();
+    sycl::free(result, q);
+    double time = timer.seconds();
+    return time;
+  }
+#endif
 
 #ifdef KOKKOS_ENABLE_OPENMPTARGET
   double ompt_dot(int R) {
@@ -109,7 +149,9 @@ struct DOT {
     double bytes_moved = 1. * sizeof(double) * N * 2 * R;
     double GB = bytes_moved / 1024 / 1024 / 1024;
     double time_kk = kk_dot(R);
-    printf("DOT KK: %e s %e GB/s\n", time_kk, GB / time_kk);
+    double time_sycl = sycl_dot(R);
+    std::cout << "DOT KK " << N << ":\t" << time_kk << " s\t" << GB/time_kk << " GB/s " << time_sycl << " s\t" << GB/time_sycl << " GB/s\t" << time_kk/time_sycl << '\n';
+
 #ifdef KOKKOS_ENABLE_OPENMPTARGET
     double time_ompt = ompt_dot(R);
     printf("DOT OMPT: %e s %e GB/s\n", time_ompt, GB / time_ompt);
