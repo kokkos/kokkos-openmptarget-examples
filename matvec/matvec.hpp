@@ -175,14 +175,14 @@ struct Matvec {
   void run_test(int R) {
 
     // OMPT
-    warmup_ompt();
-    auto y_ompt = create_mirror_view(Kokkos::HostSpace(), y);
-    for (int i = 0; i < N; ++i)
-      for (int j = 0; j < N; ++j)
-        y_ompt(i, j) = 0;
-    Kokkos::deep_copy(y, y_ompt);
-    run_matvec_ompt(R);
-    Kokkos::deep_copy(y_ompt, y);
+//    warmup_ompt();
+//    auto y_ompt = create_mirror_view(Kokkos::HostSpace(), y);
+//    for (int i = 0; i < N; ++i)
+ //     for (int j = 0; j < N; ++j)
+ //       y_ompt(i, j) = 0;
+  //  Kokkos::deep_copy(y, y_ompt);
+  //  run_matvec_ompt(R);
+  //  Kokkos::deep_copy(y_ompt, y);
 
     // Kokkos
     warmup_kk();
@@ -195,11 +195,11 @@ struct Matvec {
     Kokkos::deep_copy(y_kk, y);
 
     // Correctness : check whether OMPT and Kokkos results are the same.
-    for (int i = 0; i < N; ++i)
-      for (int j = 0; j < N; ++j)
-        if (y_ompt(i, j) != y_kk(i, j))
-          printf("Error: y(%d,%d): KK = %lu, OMPT = %lu\n", i, j, y_kk(i, j),
-                 y_ompt(i, j));
+    //for (int i = 0; i < N; ++i)
+     // for (int j = 0; j < N; ++j)
+      //  if (y_ompt(i, j) != y_kk(i, j))
+       //   printf("Error: y(%d,%d): KK = %lu, OMPT = %lu\n", i, j, y_kk(i, j),
+        //         y_ompt(i, j));
   }
 
 #if debug

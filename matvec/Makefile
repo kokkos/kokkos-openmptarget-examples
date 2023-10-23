@@ -1,30 +1,17 @@
-KOKKOS_PATH = ${HOME}/Kokkos/kokkos
-SRC = $(wildcard *.cpp)
-KOKKOS_CUDA_OPTIONS=enable_lambda
-KOKKOS_ARCH = Volta70
+include ../Makefile.inc
 
 HEADER = matvec.hpp
 
 default: build
 	echo "Start Build"
 
-EXE = test.ompt
-KOKKOS_CXX_STANDARD=c++17
+EXE = dot.${backend}
 
 CXXFLAGS = -O3 -g
 
-# To avoid warnings
-ifeq ($(DEVICE),cuda)
-KOKKOS_DEVICES = "Cuda"
-CXX = ${KOKKOS_PATH}/bin/nvcc_wrapper
-else
-KOKKOS_DEVICES=OpenMPTarget
-CXX = clang++
-CXXFLAGS += -Wno-unknown-cuda-version -Wno-undefined-internal -Wno-pass-failed -Wno-openmp-mapping -Wno-extra-tokens
-LINKFLAGS =-Wno-unknown-cuda-version
-endif
+CXXFLAGS += ${OFFLOAD_FLAGS}
 
-LINK = ${CXX}
+LINK = ${CXX} ${CXXFLAGS}
 
 DEPFLAGS = -M
 
@@ -36,10 +23,10 @@ include $(KOKKOS_PATH)/Makefile.kokkos
 build: $(EXE)
 
 $(EXE): $(OBJ) $(KOKKOS_LINK_DEPENDS)
-	$(LINK) $(KOKKOS_LDFLAGS) $(LINKFLAGS) $(EXTRA_PATH) $(OBJ) $(KOKKOS_LIBS) $(LIB) -o $(EXE)
+	$(LINK) $(KOKKOS_LDFLAGS) $(EXTRA_PATH) $(OBJ) $(KOKKOS_LIBS) $(LIB) -o $(EXE)
 
 clean: kokkos-clean
-	rm -f *.o *.cuda *.host *.ompt
+	rm -f *.o *.ompt *.cuda *.host *.openmp *.hip
 
 # Compilation rules
 
