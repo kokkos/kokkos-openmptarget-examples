@@ -14,14 +14,11 @@
 //
 //@HEADER
 
-#include <generate_matrix.hpp>
+#include <ompx.h>
 
-/*
- * There is a bug in the clang OpenMP implementation wherein if the `dot`
- * routine is called with the same View as the 1st and 2nd parameter, the norm
- * fails to converge. Hence for such cases we perform the dot product on the
- * host.
- */
+#include <generate_matrix.hpp>
+#include <iostream>
+
 struct cgsolve {
     int N, max_iter;
     double tolerance;
@@ -49,61 +46,9 @@ struct cgsolve {
     }
 
     template <class YType, class AType, class XType>
-    void spmv(YType y, AType A, XType x) {
-#if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP) || defined(KOKKOS_ENABLE_SYCL)
+    double spmv_ompt(YType y, AType A, XType x) {
         int rows_per_team = 16;
         int team_size = 16;
-        int vector_size = 8;
-#elif defined(KOKKOS_ENABLE_OPENMPTARGET)
-#if defined(KOKKOS_ARCH_INTEL_GPU)
-        int rows_per_team = 16;
-        int team_size = 16;
-        int vector_size = 1;
-#else
-        int rows_per_team = 32;
-        int team_size = 32;
-        int vector_size = 1;
-#endif
-#else
-        int rows_per_team = 512;
-        int team_size = 1;
-        int vector_size = 1;
-#endif
-        int64_t nrows = y.extent(0);
-        Kokkos::parallel_for(
-            "SPMV",
-            Kokkos::TeamPolicy<>((nrows + rows_per_team - 1) / rows_per_team,
-                                 team_size, vector_size),
-            KOKKOS_LAMBDA(const Kokkos::TeamPolicy<>::member_type &team) {
-                const int64_t first_row = team.league_rank() * rows_per_team;
-                const int64_t last_row = first_row + rows_per_team < nrows
-                                             ? first_row + rows_per_team
-                                             : nrows;
-                Kokkos::parallel_for(
-                    Kokkos::TeamThreadRange(team, first_row, last_row),
-                    [&](const int64_t row) {
-                        const int64_t row_start = A.row_ptr(row);
-                        const int64_t row_length =
-                            A.row_ptr(row + 1) - row_start;
-
-                        double y_row;
-                        Kokkos::parallel_reduce(
-                            Kokkos::ThreadVectorRange(team, row_length),
-                            [=](const int64_t i, double &sum) {
-                                sum += A.values(i + row_start) *
-                                       x(A.col_idx(i + row_start));
-                            },
-                            y_row);
-                        y(row) = y_row;
-                    });
-            });
-    }
-
-#if defined(KOKKOS_ENABLE_OPENMPTARGET)
-    template <class YType, class AType, class XType>
-    void spmv_ompt(YType y, AType A, XType x) {
-        int rows_per_team = 32;
-        int team_size = 32;
         int64_t nrows = y.extent(0);
 
         auto row_ptr = A.row_ptr.data();
@@ -113,23 +58,35 @@ struct cgsolve {
         auto yp = y.data();
 
         int64_t n = (nrows + rows_per_team - 1) / rows_per_team;
-#pragma omp target teams distribute is_device_ptr(row_ptr, values, col_idx, \
-                                                      xp, yp)
-        for (int64_t i = 0; i < n; ++i) {
-#pragma omp parallel
-            {
+
+        const int64_t nteams = (n + team_size - 1) / team_size;
+
+        Kokkos::Timer timer;
+#pragma omp target teams ompx_bare num_teams(n) thread_limit(team_size) \
+    firstprivate(row_ptr, values, col_idx, xp, yp)
+        {
+            const int blockId_x = ompx::block_id_x();
+            const int blockDim_x = ompx::block_dim_x();
+            const int gridDim_x = ompx::grid_dim_x();
+            const int threadId_x = ompx::thread_id_x();
+            for (int64_t i = blockId_x; i < n; i += gridDim_x) {
                 const int64_t first_row = i * rows_per_team;
                 const int64_t last_row = first_row + rows_per_team < nrows
                                              ? first_row + rows_per_team
                                              : nrows;
 
-#pragma omp for
-                for (int64_t row = first_row; row < last_row; ++row) {
+                for (int64_t row = first_row + threadId_x; row < last_row;
+                     row += blockDim_x) {
                     const int64_t row_start = row_ptr[row];
                     const int64_t row_length = row_ptr[row + 1] - row_start;
 
+                    // In ompx_bare, each thread gets its own y_row and hence a
+                    // += on it wont create a race condition. When multi-dim
+                    // threads are available, this could go to threadId_x and
+                    // the current one can go to threadId_y. Thats what Kokkos
+                    // does.
                     double y_row = 0.;
-#pragma omp simd reduction(+ : y_row)
+                    // #pragma omp simd reduction(+ : y_row)
                     for (int64_t i = 0; i < row_length; ++i) {
                         y_row +=
                             values[i + row_start] * xp[col_idx[i + row_start]];
@@ -138,28 +95,19 @@ struct cgsolve {
                 }
             }
         }
-    }
-#endif
+        double time = timer.seconds();
 
-    template <class YType, class XType>
-    double dot(YType y, XType x) {
-        double result;
-        Kokkos::parallel_reduce(
-            "DOT", y.extent(0),
-            KOKKOS_LAMBDA(const int64_t &i, double &lsum) {
-                lsum += y(i) * x(i);
-            },
-            result);
-        return result;
+        return time;
     }
 
-#if defined(KOKKOS_ENABLE_OPENMPTARGET)
     template <class YType, class XType>
     double dot_ompt(YType y, XType x) {
         double result;
         int n = y.extent(0);
         auto xp = x.data();
         auto yp = y.data();
+
+#pragma omp barrier
 
 #pragma omp target teams distribute parallel for is_device_ptr(xp, yp) \
     reduction(+ : result)
@@ -168,28 +116,7 @@ struct cgsolve {
         }
         return result;
     }
-#endif
 
-#if defined(KOKKOS_ENABLE_OPENMPTARGET) && !defined(KOKKOS_COMPILER_NVHPC)
-    template <class VType>
-    double dot_ompt_bug(VType r) {
-        double result = 0.;
-        auto h_r = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace(), r);
-        for (int i = 0; i < h_r.extent(0); ++i) result += h_r(i) * h_r(i);
-
-        return result;
-    }
-#endif
-
-    template <class ZType, class YType, class XType>
-    void axpby(ZType z, double alpha, XType x, double beta, YType y) {
-        int64_t n = z.extent(0);
-        Kokkos::parallel_for(
-            "AXPBY", n,
-            KOKKOS_LAMBDA(const int &i) { z(i) = alpha * x(i) + beta * y(i); });
-    }
-
-#if defined(KOKKOS_ENABLE_OPENMPTARGET)
     template <class ZType, class YType, class XType>
     void axpby_ompt(ZType z, double alpha, XType x, double beta, YType y) {
         int64_t n = z.extent(0);
@@ -197,12 +124,20 @@ struct cgsolve {
         auto yp = y.data();
         auto zp = z.data();
 
-#pragma omp target teams distribute parallel for is_device_ptr(zp, yp, xp)
-        for (int i = 0; i < n; ++i) {
+        const int team_size = 32;
+        const int nteams = (n + team_size - 1) / team_size;
+
+#pragma omp target teams ompx_bare num_teams(nteams) thread_limit(team_size) \
+    firstprivate(zp, yp, xp)
+        {
+            const int blockId = ompx::block_id_x();
+            const int blockDim = ompx::block_dim_x();
+            const int threadId = ompx::thread_id_x();
+
+            const int i = blockId * blockDim + threadId;
             zp[i] = alpha * xp[i] + beta * yp[i];
         }
     }
-#endif
 
     template <class VType>
     void print_vector(int label, VType v) {
@@ -218,84 +153,6 @@ struct cgsolve {
     }
 
     template <class VType, class AType>
-    int cg_solve_kk(VType y, AType A, VType b, int max_iter, double tolerance) {
-        int myproc = 0;
-        int num_iters = 0;
-
-        double normr = 0;
-        double rtrans = 0;
-        double oldrtrans = 0;
-
-        int64_t print_freq = max_iter / 10;
-        if (print_freq > 50) print_freq = 50;
-        if (print_freq < 1) print_freq = 1;
-        VType x("x", b.extent(0));
-        VType r("r", x.extent(0));
-        VType p("r", x.extent(0));  // Needs to be global
-        VType Ap("r", x.extent(0));
-        double one = 1.0;
-        double zero = 0.0;
-        axpby(p, one, x, zero, x);
-
-        spmv(Ap, A, p);
-        axpby(r, one, b, -one, Ap);
-
-#if defined(KOKKOS_ENABLE_OPENMPTARGET) && defined(KOKKOS_ARCH_VEGA90A)
-        rtrans = dot_ompt_bug(r);
-#else
-        rtrans = dot(r, r);
-#endif
-
-        normr = std::sqrt(rtrans);
-
-        if (myproc == 0) {
-            std::cout << "Initial Residual = " << normr << std::endl;
-        }
-
-        double brkdown_tol = std::numeric_limits<double>::epsilon();
-
-        for (int64_t k = 1; k <= max_iter && normr > tolerance; ++k) {
-            if (k == 1) {
-                axpby(p, one, r, zero, r);
-            } else {
-                oldrtrans = rtrans;
-#if defined(KOKKOS_ENABLE_OPENMPTARGET) && defined(KOKKOS_ARCH_VEGA90A)
-                rtrans = dot_ompt_bug(r);
-#else
-                rtrans = dot(r, r);
-#endif
-                double beta = rtrans / oldrtrans;
-                axpby(p, one, r, beta, p);
-            }
-
-            normr = std::sqrt(rtrans);
-
-            double alpha = 0;
-            double p_ap_dot = 0;
-
-            spmv(Ap, A, p);
-
-            p_ap_dot = dot(Ap, p);
-
-            if (p_ap_dot < brkdown_tol) {
-                if (p_ap_dot < 0) {
-                    std::cerr << "miniFE::cg_solve ERROR, numerical breakdown!"
-                              << std::endl;
-                    return num_iters;
-                } else
-                    brkdown_tol = 0.1 * p_ap_dot;
-            }
-            alpha = rtrans / p_ap_dot;
-
-            axpby(x, one, x, alpha, p);
-            axpby(r, one, r, -alpha, Ap);
-            num_iters = k;
-        }
-        return num_iters;
-    }
-
-#if defined(KOKKOS_ENABLE_OPENMPTARGET)
-    template <class VType, class AType>
     int cg_solve_ompt(VType y, AType A, VType b, int max_iter,
                       double tolerance) {
         int myproc = 0;
@@ -305,25 +162,24 @@ struct cgsolve {
         double rtrans = 0;
         double oldrtrans = 0;
 
+        double spmv_time = 0.;
+
         int64_t print_freq = max_iter / 10;
         if (print_freq > 50) print_freq = 50;
         if (print_freq < 1) print_freq = 1;
         VType x("x", b.extent(0));
         VType r("r", x.extent(0));
+        VType r_("r_", x.extent(0));
         VType p("r", x.extent(0));  // Needs to be global
         VType Ap("r", x.extent(0));
         double one = 1.0;
         double zero = 0.0;
         axpby_ompt(p, one, x, zero, x);
 
-        spmv_ompt(Ap, A, p);
+        spmv_time += spmv_ompt(Ap, A, p);
         axpby_ompt(r, one, b, -one, Ap);
 
-#if defined(KOKKOS_COMPILER_CLANG)
-        rtrans = dot_ompt_bug(r);
-#else
         rtrans = dot_ompt(r, r);
-#endif
 
         normr = std::sqrt(rtrans);
 
@@ -338,11 +194,7 @@ struct cgsolve {
                 axpby_ompt(p, one, r, zero, r);
             } else {
                 oldrtrans = rtrans;
-#if defined(KOKKOS_COMPILER_CLANG)
-                rtrans = dot_ompt_bug(r);
-#else
                 rtrans = dot_ompt(r, r);
-#endif
                 double beta = rtrans / oldrtrans;
                 axpby_ompt(p, one, r, beta, p);
             }
@@ -352,7 +204,7 @@ struct cgsolve {
             double alpha = 0;
             double p_ap_dot = 0;
 
-            spmv_ompt(Ap, A, p);
+            spmv_time += spmv_ompt(Ap, A, p);
 
             p_ap_dot = dot_ompt(Ap, p);
 
@@ -370,53 +222,25 @@ struct cgsolve {
             axpby_ompt(r, one, r, -alpha, Ap);
             num_iters = k;
         }
-        return num_iters;
-    }
-#endif
 
-    void run_kk_test() {
-        Kokkos::Timer timer;
-        int num_iters = cg_solve_kk(y, A, x, max_iter, tolerance);
-        double time = timer.seconds();
-
-        // Compute Bytes and Flops
+        // Compute SPMV Bytes and Flops
         double spmv_bytes =
             A.num_rows() * sizeof(int64_t) + A.nnz() * sizeof(int64_t) +
             A.nnz() * sizeof(double) + A.nnz() * sizeof(double) +
             A.num_rows() * sizeof(double);
-
-        double dot_bytes = x.extent(0) * sizeof(double) * 2;
-        double axpby_bytes = x.extent(0) * sizeof(double) * 3;
-
-        double GB = (spmv_bytes + dot_bytes + axpby_bytes) / 1024 / 1024 / 1024;
-        printf("Data Transferred = %f GBs\n", GB);
-
         double spmv_flops = A.nnz() * 2;
-        double dot_flops = x.extent(0) * 2;
-        double axpby_flops = x.extent(0) * 3;
 
-        int spmv_calls = 1 + num_iters;
-        int dot_calls = num_iters;
-        int axpby_calls = 2 + num_iters * 3;
+        double GB = (spmv_bytes) / 1024 / 1024 / 1024;
 
-        // KK info
-        printf("KK: CGSolve for 3D (%i %i %i); %i iterations; %lf time\n", N, N,
-               N, num_iters, time);
-        printf(
-            "KK: Performance: %lf GFlop/s %lf GB/s (Calls SPMV: %i Dot: %i "
-            "AXPBY: %i\n",
-            1e-9 *
-                (spmv_flops * spmv_calls + dot_flops * dot_calls +
-                 axpby_flops * axpby_calls) /
-                time,
-            (1.0 / 1024 / 1024 / 1024) *
-                (spmv_bytes * spmv_calls + dot_bytes * dot_calls +
-                 axpby_bytes * axpby_calls) /
-                time,
-            spmv_calls, dot_calls, axpby_calls);
+        printf("************ SPMV ************ \n");
+        printf("OMPT : SPMV : Data Transfered = %f GBs\n", GB);
+        printf("OMPT: SPMV Performance: %lf GFlop/s %lf GB/s \n",
+               1e-9 * (spmv_flops * (num_iters + 1)) / spmv_time,
+               (1.0 / 1024 / 1024 / 1024) * (spmv_bytes * (num_iters + 1)) /
+                   spmv_time);
+        return num_iters;
     }
 
-#if defined(KOKKOS_ENABLE_OPENMPTARGET)
     void run_ompt_test() {
         Kokkos::Timer timer;
         int num_iters = cg_solve_ompt(y, A, x, max_iter, tolerance);
@@ -440,6 +264,7 @@ struct cgsolve {
         int axpby_calls = 2 + num_iters * 3;
 
         // OMPT info
+        printf("CGSolve \n");
         printf("OMPT: CGSolve for 3D (%i %i %i); %i iterations; %lf time\n", N,
                N, N, num_iters, time);
         printf(
@@ -455,17 +280,11 @@ struct cgsolve {
                 time,
             spmv_calls, dot_calls, axpby_calls);
     }
-#endif
 
     void run_test() {
-        printf("*******Kokkos***************\n");
-        printf("Kokkos::ExecutionSpace = %s\n",
-               typeid(Kokkos::DefaultExecutionSpace).name());
-        run_kk_test();
-#if defined(KOKKOS_ENABLE_OPENMPTARGET)
         printf("*******OpenMPTarget***************\n");
         run_ompt_test();
-#endif
+        printf("\n");
     }
 };
 

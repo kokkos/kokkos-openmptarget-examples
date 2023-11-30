@@ -4,6 +4,8 @@ KOKKOS_CXX_STANDARD=c++17
 
 OFFLOAD_FLAGS ?= -fopenmp
 arch ?= A100
+backend ?= ompt
+comp ?= clang
 
 ifeq ($(arch), A100)
     KOKKOS_ARCH=Ampere80
