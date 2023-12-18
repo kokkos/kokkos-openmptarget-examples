@@ -16,6 +16,7 @@
 
 #include <Kokkos_Core.hpp>
 #include <cmath>
+#include <iostream>
 
 struct DOT {
   using view_t = Kokkos::View<double *>;
@@ -64,7 +65,7 @@ struct DOT {
 				    int i = idx;
 				    sum += x_data_[i]*y_data_[i];
 						    });});
-    q.submit_barrier();
+    //q.submit_barrier();
     q.memcpy(&result, result_ptr, sizeof(double));
     q.wait();
 

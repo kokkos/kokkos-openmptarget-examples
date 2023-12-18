@@ -28,8 +28,11 @@ struct cgsolve {
     Kokkos::View<double *> y, x;
     CrsMatrix<Kokkos::DefaultExecutionSpace::memory_space> A;
 
+    static_assert(std::is_same_v<Kokkos::DefaultExecutionSpace, Kokkos::Experimental::SYCL>);
+
     cgsolve(int N_, int max_iter_in, double tolerance_in)
         : N(N_), max_iter(max_iter_in), tolerance(tolerance_in) {
+	std::cout << "cgsolve constructor" << std::endl;
         CrsMatrix<Kokkos::HostSpace> h_A = Impl::generate_miniFE_matrix(N);
         Kokkos::View<double *, Kokkos::HostSpace> h_x =
             Impl::generate_miniFE_vector(N);
@@ -37,8 +40,10 @@ struct cgsolve {
         Kokkos::View<int64_t *> row_ptr("row_ptr", h_A.row_ptr.extent(0));
         Kokkos::View<int64_t *> col_idx("col_idx", h_A.col_idx.extent(0));
         Kokkos::View<double *> values("values", h_A.values.extent(0));
+	std::cout << "before CrsMatrix constructor" << std::endl;
         A = CrsMatrix<Kokkos::DefaultExecutionSpace::memory_space>(
             row_ptr, col_idx, values, h_A.num_cols());
+        std::cout << "after CrsMatrix constructor" << std::endl;
         x = Kokkos::View<double *>("X", h_x.extent(0));
         y = Kokkos::View<double *>("Y", h_x.extent(0));
 
@@ -46,6 +51,8 @@ struct cgsolve {
         Kokkos::deep_copy(A.row_ptr, h_A.row_ptr);
         Kokkos::deep_copy(A.col_idx, h_A.col_idx);
         Kokkos::deep_copy(A.values, h_A.values);
+	
+	std::cout << "cgsolve end of constructor" << std::endl;
     }
 
     template <class YType, class AType, class XType>
@@ -70,6 +77,7 @@ struct cgsolve {
         int vector_size = 1;
 #endif
         int64_t nrows = y.extent(0);
+	std::cout << "before SPMV" << std::endl;
         Kokkos::parallel_for(
             "SPMV",
             Kokkos::TeamPolicy<>((nrows + rows_per_team - 1) / rows_per_team,

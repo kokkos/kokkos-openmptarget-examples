@@ -29,7 +29,10 @@ int main(int argc, char* argv[]) {
     int max_iter = argc>2?atoi(argv[2]):200;
     double tolerance = argc>3?atoi(argv[3]):1e-7;
 
+    std::cout << "before cgsolve" << std::endl;
     cgsolve obj(N, max_iter, tolerance);
+    std::cout << "before run_test" << std::endl;
+
     obj.run_test();
   }
   Kokkos::finalize();
