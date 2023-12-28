@@ -21,10 +21,13 @@
 int main(int argc, char *argv[]) {
   Kokkos::initialize(argc, argv);
   {
-    int N = argc > 1 ? atoi(argv[1]) : 1000000;
-    int R = argc > 2 ? atoi(argv[2]) : 10;
-    AXPBY axpby(N, false);
-    axpby.run_test(R);
+    int N = argc > 1 ? atoi(argv[1]) : 10'000'000'000;
+	                             //2'147'483'647;
+    int R = argc > 2 ? atoi(argv[2]) : 100;
+    for (unsigned int n = 2; n<100000001; n*=2) {
+      AXPBY axpby(n, false);
+      axpby.run_test(R);
+    }
   }
   Kokkos::finalize();
 }

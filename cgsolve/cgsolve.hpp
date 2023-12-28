@@ -77,7 +77,7 @@ struct cgsolve {
         int vector_size = 1;
 #endif
         int64_t nrows = y.extent(0);
-	std::cout << "before SPMV" << std::endl;
+	//std::cout << "before SPMV" << std::endl;
         Kokkos::parallel_for(
             "SPMV",
             Kokkos::TeamPolicy<>((nrows + rows_per_team - 1) / rows_per_team,

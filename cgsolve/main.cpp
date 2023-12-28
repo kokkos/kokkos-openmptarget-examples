@@ -25,7 +25,7 @@
 int main(int argc, char* argv[]) {
   Kokkos::initialize(argc,argv);
   {
-    int N = argc>1?atoi(argv[1]):1000;
+    int N = argc>1?atoi(argv[1]):100;
     int max_iter = argc>2?atoi(argv[2]):200;
     double tolerance = argc>3?atoi(argv[3]):1e-7;
 

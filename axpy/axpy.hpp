@@ -32,7 +32,37 @@ struct AXPBY {
           fence_all(fence_all_) {}
 
     KOKKOS_FUNCTION
-    void operator()(int i) const { z(i) = x(i) + y(i); }
+    void operator()(int i) const { for (int j=0; j<10000; ++j) z(i) += x(i) + y(i); }
+
+      #ifdef KOKKOS_ENABLE_SYCL
+  double sycl_axpby(int R) {
+    AXPBY f(*this);
+    int N_ = N;
+    sycl::queue q{sycl::property::queue::in_order()};
+    auto x_data = x.data();
+    auto y_data = y.data();
+    auto z_data = z.data();
+    // Warmup
+                    q.parallel_for(sycl::range<1>(N_), [=](sycl::id<1> idx) {
+                                    int i = idx;
+				    z_data[i] = x_data[i] + y_data[i];
+				    });
+    q.wait();
+
+    Kokkos::Timer timer;
+    for (int r = 0; r < R; r++) {
+	                        q.parallel_for(sycl::range<1>(N_), [=](sycl::id<1> idx) {
+                                     int i = idx;
+				     for (int j=0; j<20000; ++j)
+				     z_data[i] += x_data[i] + y_data[i];
+                                    });
+      //q.wait();
+    }
+    q.wait();
+    double time = timer.seconds();
+    return time;
+  }
+#endif
 
     double kk_axpby(int R) {
         // Warmup
@@ -42,7 +72,7 @@ struct AXPBY {
         Kokkos::Timer timer;
         for (int r = 0; r < R; r++) {
             Kokkos::parallel_for("kk_axpby", N, *this);
-            if (fence_all) Kokkos::fence();
+            //Kokkos::fence();
         }
         Kokkos::fence();
         double time = timer.seconds();
@@ -109,12 +139,13 @@ map(to : N_)
 
     void run_test(int R) {
         double bytes_moved = 1. * sizeof(double) * N * 3 * R;
-        double GB = bytes_moved / 1024 / 1024 / 1024;
-        printf("\n\nBytes moved[GBs] = %f\n", GB);
+        //double GB = bytes_moved / 1024 / 1024 / 1024;
+	double FLOPS = 20000.*N*R;
 
         // Kokkos version
         double time_kk = kk_axpby(R);
-        printf("AXPBY KK: %e s %e GB/s\n", time_kk, GB / time_kk);
+	double time_sycl = sycl_axpby(R);
+	std::cout << N << ":\t" << time_kk << " s\t" << FLOPS/time_kk << " GB/s" << time_sycl << " s\t" << FLOPS/time_sycl << " GB/s\t" << time_kk/time_sycl << '\n';
 #ifdef KOKKOS_ENABLE_OPENMPTARGET
 
         // Native OpenMPTarget version that passes a functor to the target region.

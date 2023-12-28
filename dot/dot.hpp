@@ -53,7 +53,7 @@ struct DOT {
   double sycl_dot(int R) {
     DOT f(*this);
     int N_ = N;
-    sycl::queue q;
+    sycl::queue q{sycl::property::queue::in_order()};
     auto x_data_ = x_data;
     auto y_data_ = y_data;
     // Warmup
@@ -71,15 +71,15 @@ struct DOT {
 
     Kokkos::Timer timer;
     for (int r = 0; r < R; r++) {
-      auto event = q.submit([&](sycl::handler& cgh) {
-                    cgh.parallel_for(sycl::range<1>(N_), sycl::reduction(result_ptr, 0., sycl::plus<double>()),
+      //auto event = q.submit([&](sycl::handler& cgh) {
+                    q.parallel_for(sycl::range<1>(N_), sycl::reduction(result_ptr, 0., sycl::plus<double>()),
                                     [=](sycl::id<1> idx, auto&sum) {
 				    for (unsigned int j=0; j<1; ++j) {
                                     int i = idx;
 				    sum += x_data_[i]*y_data_[i];
 				    }
-                                                    });});
-      q.ext_oneapi_submit_barrier(std::vector{event});
+                                                    });//}//);
+      //q.ext_oneapi_submit_barrier(std::vector{event});
       q.memcpy(&result, result_ptr, sizeof(double));
       q.wait();
     }
@@ -155,8 +155,8 @@ struct DOT {
     double bytes_moved = 1. * sizeof(double) * N * 2 * R;
     double GB = bytes_moved / 1024 / 1024 / 1024;
     double time_kk = kk_dot(R);
-    //double time_sycl = sycl_dot(R);
-    std::cout << "DOT KK " << N << ":\t" << time_kk << " s\t" << GB/time_kk << " GB/s\n";// << time_sycl << " s\t" << GB/time_sycl << " GB/s\t" << time_kk/time_sycl << '\n';
+    double time_sycl = sycl_dot(R);
+    std::cout << "DOT KK " << N << ":\t" << time_kk << " s\t" << GB/time_kk << " GB/s" << time_sycl << " s\t" << GB/time_sycl << " GB/s\t" << time_kk/time_sycl << '\n';
 
 #ifdef KOKKOS_ENABLE_OPENMPTARGET
     double time_ompt = ompt_dot(R);
