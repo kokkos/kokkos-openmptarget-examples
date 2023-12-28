@@ -446,11 +446,11 @@ struct cgsolve {
         int dot_calls = num_iters;
         int axpby_calls = 2 + num_iters * 3;
 
-        // OMPT info
-        printf("OMPT: CGSolve for 3D (%i %i %i); %i iterations; %lf time\n", N,
+        // SYCL info
+        printf("SYCL: CGSolve for 3D (%i %i %i); %i iterations; %lf time\n", N,
                N, N, num_iters, time);
         printf(
-            "OMPT: Performance: %lf GFlop/s %lf GB/s (Calls SPMV: %i Dot: %i "
+            "SYCL: Performance: %lf GFlop/s %lf GB/s (Calls SPMV: %i Dot: %i "
             "AXPBY: %i\n",
             1e-9 *
                 (spmv_flops * spmv_calls + dot_flops * dot_calls +
