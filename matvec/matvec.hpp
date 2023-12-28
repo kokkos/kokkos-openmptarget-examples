@@ -139,6 +139,44 @@ struct Matvec {
     printf("KK: Timer taken = %f[secs] \n", timer.seconds());
   }
 
+  KOKKOS_INLINE_FUNCTION
+  void batched_matrix_vector_sycl() {
+    sycl::queue q{sycl::property::queue::in_order()};
+
+    team_policy policy(m.extent(0), 32, 32);
+
+    Kokkos::parallel_for(
+        policy, KOKKOS_CLASS_LAMBDA(const member_type &team) {
+          const int i = team.league_rank();
+          auto y_sub = Kokkos::subview(y, i, Kokkos::ALL);
+          auto x_sub = Kokkos::subview(x, i, Kokkos::ALL);
+          Kokkos::parallel_for(
+              Kokkos::TeamThreadRange(team, N), [&](const int j) {
+                auto m_sub = Kokkos::subview(m, i, j, Kokkos::ALL);
+                int64_t result = 0;
+                Kokkos::parallel_reduce(
+                    Kokkos::ThreadVectorRange(team, N),
+                    [&](const int k, int64_t &update) {
+                      update += m_sub(k) * x_sub(k);
+                    },
+                    result);
+
+                y_sub(j) += result;
+              });
+        });
+  }
+
+  KOKKOS_INLINE_FUNCTION
+  void run_matvec_sycl(int R) {
+    Kokkos::Timer timer;
+
+    for (int r = 0; r < R; ++r) {
+      batched_matrix_vector_kokkos();
+    }
+
+    printf("KK: Timer taken = %f[secs] \n", timer.seconds());
+  }
+
   void warmup_ompt() {
     int64_t *m_ptr = m.data();
     int64_t *x_ptr = x.data();

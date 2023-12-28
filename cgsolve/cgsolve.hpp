@@ -61,10 +61,10 @@ struct cgsolve {
         int rows_per_team = 16;
         int team_size = 16;
         int vector_size = 8;
-#elif defined(KOKKOS_ENABLE_OPENMPTARGET)
+#elif defined(KOKKOS_ENABLE_SYCL)
 #if defined(KOKKOS_ARCH_INTEL_GPU)
-        int rows_per_team = 16;
-        int team_size = 16;
+        int rows_per_team = 32;
+        int team_size = 32;
         int vector_size = 1;
 #else
         int rows_per_team = 32;
@@ -107,9 +107,9 @@ struct cgsolve {
             });
     }
 
-#if defined(KOKKOS_ENABLE_OPENMPTARGET)
+#if defined(KOKKOS_ENABLE_SYCL)
     template <class YType, class AType, class XType>
-    void spmv_ompt(YType y, AType A, XType x) {
+    void spmv_sycl(YType y, AType A, XType x) {
         int rows_per_team = 32;
         int team_size = 32;
         int64_t nrows = y.extent(0);
@@ -121,31 +121,24 @@ struct cgsolve {
         auto yp = y.data();
 
         int64_t n = (nrows + rows_per_team - 1) / rows_per_team;
-#pragma omp target teams distribute is_device_ptr(row_ptr, values, col_idx, \
-                                                      xp, yp)
-        for (int64_t i = 0; i < n; ++i) {
-#pragma omp parallel
-            {
-                const int64_t first_row = i * rows_per_team;
-                const int64_t last_row = first_row + rows_per_team < nrows
+	sycl::queue q{sycl::property::queue::in_order()};
+        q.submit([&] (sycl::handler& cgh) {
+          cgh.parallel_for_work_group(sycl::range<1>(n), sycl::range<1>(team_size), [=](sycl::group<1> g) {
+	    const int64_t first_row = g.get_group_id(0) * rows_per_team;
+            const int64_t last_row = first_row + rows_per_team < nrows
                                              ? first_row + rows_per_team
                                              : nrows;
-
-#pragma omp for
-                for (int64_t row = first_row; row < last_row; ++row) {
-                    const int64_t row_start = row_ptr[row];
-                    const int64_t row_length = row_ptr[row + 1] - row_start;
-
-                    double y_row = 0.;
-#pragma omp simd reduction(+ : y_row)
-                    for (int64_t i = 0; i < row_length; ++i) {
-                        y_row +=
-                            values[i + row_start] * xp[col_idx[i + row_start]];
-                    }
-                    yp[row] = y_row;
-                }
-            }
-        }
+	    g.parallel_for_work_item(sycl::range<1>(last_row-first_row), [&](sycl::h_item<1> item) {
+              const int64_t row = item.get_local_id(0) + first_row;
+	      const int64_t row_start = row_ptr[row];
+              const int64_t row_length = row_ptr[row + 1] - row_start;
+              double y_row = 0.;
+              for (int64_t i = 0; i < row_length; ++i)
+                y_row += values[i + row_start] * xp[col_idx[i + row_start]];
+              yp[row] = y_row;
+            });
+          });
+        });
     }
 #endif
 
@@ -161,26 +154,31 @@ struct cgsolve {
         return result;
     }
 
-#if defined(KOKKOS_ENABLE_OPENMPTARGET)
+#if defined(KOKKOS_ENABLE_SYCL)
     template <class YType, class XType>
-    double dot_ompt(YType y, XType x) {
-        double result;
+    double dot_sycl(YType y, XType x) {
+        sycl::queue q{sycl::property::queue::in_order()};
         int n = y.extent(0);
         auto xp = x.data();
         auto yp = y.data();
 
-#pragma omp target teams distribute parallel for is_device_ptr(xp, yp) \
-    reduction(+ : result)
-        for (int i = 0; i < n; ++i) {
-            result += yp[i] * xp[i];
-        }
-        return result;
+	double result = 0.;
+	sycl::buffer<double> result_buffer{&result, 1};
+	q.submit([&](sycl::handler& cgh) {
+	  auto reducer = sycl::reduction(result_buffer, cgh, sycl::plus<>());
+	  cgh.parallel_for(sycl::range<1>(n), reducer, 
+            [=](sycl::id<1> idx, auto&sum) {
+              int i = idx;
+              sum += yp[i]*xp[i];
+            });
+	});
+	return result_buffer.get_host_access()[0];  
     }
 #endif
 
-#if defined(KOKKOS_ENABLE_OPENMPTARGET) && !defined(KOKKOS_COMPILER_NVHPC)
+#if defined(KOKKOS_ENABLE_SYCL) && !defined(KOKKOS_COMPILER_NVHPC)
     template <class VType>
-    double dot_ompt_bug(VType r) {
+    double dot_sycl_bug(VType r) {
         double result = 0.;
         auto h_r = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace(), r);
         for (int i = 0; i < h_r.extent(0); ++i) result += h_r(i) * h_r(i);
@@ -197,18 +195,19 @@ struct cgsolve {
             KOKKOS_LAMBDA(const int &i) { z(i) = alpha * x(i) + beta * y(i); });
     }
 
-#if defined(KOKKOS_ENABLE_OPENMPTARGET)
+#if defined(KOKKOS_ENABLE_SYCL)
     template <class ZType, class YType, class XType>
-    void axpby_ompt(ZType z, double alpha, XType x, double beta, YType y) {
+    void axpby_sycl(ZType z, double alpha, XType x, double beta, YType y) {
+        sycl::queue q{sycl::property::queue::in_order()};
         int64_t n = z.extent(0);
         auto xp = x.data();
         auto yp = y.data();
         auto zp = z.data();
 
-#pragma omp target teams distribute parallel for is_device_ptr(zp, yp, xp)
-        for (int i = 0; i < n; ++i) {
-            zp[i] = alpha * xp[i] + beta * yp[i];
-        }
+	q.parallel_for(sycl::range<1>(n), [=](sycl::id<1> idx) {
+          int i = idx;
+          zp[i] = alpha * xp[i] + beta * yp[i];
+        }).wait();
     }
 #endif
 
@@ -248,8 +247,8 @@ struct cgsolve {
         spmv(Ap, A, p);
         axpby(r, one, b, -one, Ap);
 
-#if defined(KOKKOS_ENABLE_OPENMPTARGET) && defined(KOKKOS_ARCH_VEGA90A)
-        rtrans = dot_ompt_bug(r);
+#if defined(KOKKOS_ENABLE_SYCL) && defined(KOKKOS_ARCH_VEGA90A)
+        rtrans = dot_sycl_bug(r);
 #else
         rtrans = dot(r, r);
 #endif
@@ -267,8 +266,8 @@ struct cgsolve {
                 axpby(p, one, r, zero, r);
             } else {
                 oldrtrans = rtrans;
-#if defined(KOKKOS_ENABLE_OPENMPTARGET) && defined(KOKKOS_ARCH_VEGA90A)
-                rtrans = dot_ompt_bug(r);
+#if defined(KOKKOS_ENABLE_SYCL) && defined(KOKKOS_ARCH_VEGA90A)
+                rtrans = dot_sycl_bug(r);
 #else
                 rtrans = dot(r, r);
 #endif
@@ -302,9 +301,9 @@ struct cgsolve {
         return num_iters;
     }
 
-#if defined(KOKKOS_ENABLE_OPENMPTARGET)
+#if defined(KOKKOS_ENABLE_SYCL)
     template <class VType, class AType>
-    int cg_solve_ompt(VType y, AType A, VType b, int max_iter,
+    int cg_solve_sycl(VType y, AType A, VType b, int max_iter,
                       double tolerance) {
         int myproc = 0;
         int num_iters = 0;
@@ -322,15 +321,15 @@ struct cgsolve {
         VType Ap("r", x.extent(0));
         double one = 1.0;
         double zero = 0.0;
-        axpby_ompt(p, one, x, zero, x);
+        axpby_sycl(p, one, x, zero, x);
 
-        spmv_ompt(Ap, A, p);
-        axpby_ompt(r, one, b, -one, Ap);
+        spmv_sycl(Ap, A, p);
+        axpby_sycl(r, one, b, -one, Ap);
 
 #if defined(KOKKOS_COMPILER_CLANG)
-        rtrans = dot_ompt_bug(r);
+        rtrans = dot_sycl_bug(r);
 #else
-        rtrans = dot_ompt(r, r);
+        rtrans = dot_sycl(r, r);
 #endif
 
         normr = std::sqrt(rtrans);
@@ -343,16 +342,16 @@ struct cgsolve {
 
         for (int64_t k = 1; k <= max_iter && normr > tolerance; ++k) {
             if (k == 1) {
-                axpby_ompt(p, one, r, zero, r);
+                axpby_sycl(p, one, r, zero, r);
             } else {
                 oldrtrans = rtrans;
 #if defined(KOKKOS_COMPILER_CLANG)
-                rtrans = dot_ompt_bug(r);
+                rtrans = dot_sycl_bug(r);
 #else
-                rtrans = dot_ompt(r, r);
+                rtrans = dot_sycl(r, r);
 #endif
                 double beta = rtrans / oldrtrans;
-                axpby_ompt(p, one, r, beta, p);
+                axpby_sycl(p, one, r, beta, p);
             }
 
             normr = std::sqrt(rtrans);
@@ -360,9 +359,9 @@ struct cgsolve {
             double alpha = 0;
             double p_ap_dot = 0;
 
-            spmv_ompt(Ap, A, p);
+            spmv_sycl(Ap, A, p);
 
-            p_ap_dot = dot_ompt(Ap, p);
+            p_ap_dot = dot_sycl(Ap, p);
 
             if (p_ap_dot < brkdown_tol) {
                 if (p_ap_dot < 0) {
@@ -374,8 +373,8 @@ struct cgsolve {
             }
             alpha = rtrans / p_ap_dot;
 
-            axpby_ompt(x, one, x, alpha, p);
-            axpby_ompt(r, one, r, -alpha, Ap);
+            axpby_sycl(x, one, x, alpha, p);
+            axpby_sycl(r, one, r, -alpha, Ap);
             num_iters = k;
         }
         return num_iters;
@@ -424,10 +423,10 @@ struct cgsolve {
             spmv_calls, dot_calls, axpby_calls);
     }
 
-#if defined(KOKKOS_ENABLE_OPENMPTARGET)
-    void run_ompt_test() {
+#if defined(KOKKOS_ENABLE_SYCL)
+    void run_sycl_test() {
         Kokkos::Timer timer;
-        int num_iters = cg_solve_ompt(y, A, x, max_iter, tolerance);
+        int num_iters = cg_solve_sycl(y, A, x, max_iter, tolerance);
         double time = timer.seconds();
 
         // Compute Bytes and Flops
@@ -470,9 +469,9 @@ struct cgsolve {
         printf("Kokkos::ExecutionSpace = %s\n",
                typeid(Kokkos::DefaultExecutionSpace).name());
         run_kk_test();
-#if defined(KOKKOS_ENABLE_OPENMPTARGET)
+#if defined(KOKKOS_ENABLE_SYCL)
         printf("*******OpenMPTarget***************\n");
-        run_ompt_test();
+        run_sycl_test();
 #endif
     }
 };
