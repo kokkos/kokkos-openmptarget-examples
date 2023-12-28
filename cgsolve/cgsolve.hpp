@@ -109,7 +109,7 @@ struct cgsolve {
 
 #if defined(KOKKOS_ENABLE_SYCL)
     template <class YType, class AType, class XType>
-    void spmv_sycl(YType y, AType A, XType x) {
+    void spmv_sycl(sycl::queue q, YType y, AType A, XType x) {
         int rows_per_team = 32;
         int team_size = 32;
         int64_t nrows = y.extent(0);
@@ -121,7 +121,6 @@ struct cgsolve {
         auto yp = y.data();
 
         int64_t n = (nrows + rows_per_team - 1) / rows_per_team;
-	sycl::queue q{sycl::property::queue::in_order()};
         q.submit([&] (sycl::handler& cgh) {
           cgh.parallel_for_work_group(sycl::range<1>(n), sycl::range<1>(team_size), [=](sycl::group<1> g) {
 	    const int64_t first_row = g.get_group_id(0) * rows_per_team;
@@ -156,8 +155,7 @@ struct cgsolve {
 
 #if defined(KOKKOS_ENABLE_SYCL)
     template <class YType, class XType>
-    double dot_sycl(YType y, XType x) {
-        sycl::queue q{sycl::property::queue::in_order()};
+    double dot_sycl(sycl::queue q, YType y, XType x) {
         int n = y.extent(0);
         auto xp = x.data();
         auto yp = y.data();
@@ -197,8 +195,7 @@ struct cgsolve {
 
 #if defined(KOKKOS_ENABLE_SYCL)
     template <class ZType, class YType, class XType>
-    void axpby_sycl(ZType z, double alpha, XType x, double beta, YType y) {
-        sycl::queue q{sycl::property::queue::in_order()};
+    void axpby_sycl(sycl::queue q, ZType z, double alpha, XType x, double beta, YType y) {
         int64_t n = z.extent(0);
         auto xp = x.data();
         auto yp = y.data();
@@ -207,7 +204,7 @@ struct cgsolve {
 	q.parallel_for(sycl::range<1>(n), [=](sycl::id<1> idx) {
           int i = idx;
           zp[i] = alpha * xp[i] + beta * yp[i];
-        }).wait();
+        });
     }
 #endif
 
@@ -308,7 +305,9 @@ struct cgsolve {
         int myproc = 0;
         int num_iters = 0;
 
-        double normr = 0;
+	sycl::queue q{sycl::property::queue::in_order()};
+
+	double normr = 0;
         double rtrans = 0;
         double oldrtrans = 0;
 
@@ -321,15 +320,15 @@ struct cgsolve {
         VType Ap("r", x.extent(0));
         double one = 1.0;
         double zero = 0.0;
-        axpby_sycl(p, one, x, zero, x);
+        axpby_sycl(q, p, one, x, zero, x);
 
-        spmv_sycl(Ap, A, p);
-        axpby_sycl(r, one, b, -one, Ap);
+        spmv_sycl(q, Ap, A, p);
+        axpby_sycl(q, r, one, b, -one, Ap);
 
 #if defined(KOKKOS_COMPILER_CLANG)
         rtrans = dot_sycl_bug(r);
 #else
-        rtrans = dot_sycl(r, r);
+        rtrans = dot_sycl(q, r, r);
 #endif
 
         normr = std::sqrt(rtrans);
@@ -342,16 +341,16 @@ struct cgsolve {
 
         for (int64_t k = 1; k <= max_iter && normr > tolerance; ++k) {
             if (k == 1) {
-                axpby_sycl(p, one, r, zero, r);
+                axpby_sycl(q, p, one, r, zero, r);
             } else {
                 oldrtrans = rtrans;
 #if defined(KOKKOS_COMPILER_CLANG)
                 rtrans = dot_sycl_bug(r);
 #else
-                rtrans = dot_sycl(r, r);
+                rtrans = dot_sycl(q, r, r);
 #endif
                 double beta = rtrans / oldrtrans;
-                axpby_sycl(p, one, r, beta, p);
+                axpby_sycl(q, p, one, r, beta, p);
             }
 
             normr = std::sqrt(rtrans);
@@ -359,9 +358,9 @@ struct cgsolve {
             double alpha = 0;
             double p_ap_dot = 0;
 
-            spmv_sycl(Ap, A, p);
+            spmv_sycl(q, Ap, A, p);
 
-            p_ap_dot = dot_sycl(Ap, p);
+            p_ap_dot = dot_sycl(q, Ap, p);
 
             if (p_ap_dot < brkdown_tol) {
                 if (p_ap_dot < 0) {
@@ -373,8 +372,8 @@ struct cgsolve {
             }
             alpha = rtrans / p_ap_dot;
 
-            axpby_sycl(x, one, x, alpha, p);
-            axpby_sycl(r, one, r, -alpha, Ap);
+            axpby_sycl(q, x, one, x, alpha, p);
+            axpby_sycl(q, r, one, r, -alpha, Ap);
             num_iters = k;
         }
         return num_iters;
