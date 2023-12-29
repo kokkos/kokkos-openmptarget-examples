@@ -57,27 +57,11 @@ struct cgsolve {
 
     template <class YType, class AType, class XType>
     void spmv(YType y, AType A, XType x) {
-#if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP) || defined(KOKKOS_ENABLE_SYCL)
-        int rows_per_team = 16;
+        int rows_per_team = 32; //10240 too large, 5120 OK
         int team_size = 16;
-        int vector_size = 8;
-#elif defined(KOKKOS_ENABLE_SYCL)
-#if defined(KOKKOS_ARCH_INTEL_GPU)
-        int rows_per_team = 32;
-        int team_size = 32;
-        int vector_size = 1;
-#else
-        int rows_per_team = 32;
-        int team_size = 32;
-        int vector_size = 1;
-#endif
-#else
-        int rows_per_team = 512;
-        int team_size = 1;
-        int vector_size = 1;
-#endif
+        int vector_size = 4;
         int64_t nrows = y.extent(0);
-	//std::cout << "before SPMV" << std::endl;
+	//std::cout << nrows << std::endl;
         Kokkos::parallel_for(
             "SPMV",
             Kokkos::TeamPolicy<>((nrows + rows_per_team - 1) / rows_per_team,
@@ -111,7 +95,7 @@ struct cgsolve {
     template <class YType, class AType, class XType>
     void spmv_sycl(sycl::queue q, YType y, AType A, XType x) {
         int rows_per_team = 32;
-        int team_size = 32;
+        int team_size = 16;
         int64_t nrows = y.extent(0);
 
         auto row_ptr = A.row_ptr.data();
@@ -122,7 +106,7 @@ struct cgsolve {
 
         int64_t n = (nrows + rows_per_team - 1) / rows_per_team;
         q.submit([&] (sycl::handler& cgh) {
-          cgh.parallel_for_work_group(sycl::range<1>(n), sycl::range<1>(team_size), [=](sycl::group<1> g) {
+         cgh.parallel_for_work_group(sycl::range<1>(n), sycl::range<1>(team_size), [=](sycl::group<1> g) {
 	    const int64_t first_row = g.get_group_id(0) * rows_per_team;
             const int64_t last_row = first_row + rows_per_team < nrows
                                              ? first_row + rows_per_team
@@ -191,11 +175,12 @@ struct cgsolve {
         Kokkos::parallel_for(
             "AXPBY", n,
             KOKKOS_LAMBDA(const int &i) { z(i) = alpha * x(i) + beta * y(i); });
+	//Kokkos::fence();
     }
 
 #if defined(KOKKOS_ENABLE_SYCL)
     template <class ZType, class YType, class XType>
-    void axpby_sycl(sycl::queue q, ZType z, double alpha, XType x, double beta, YType y) {
+    void axpby_sycl(sycl::queue& q, ZType z, double alpha, XType x, double beta, YType y) {
         int64_t n = z.extent(0);
         auto xp = x.data();
         auto yp = y.data();
@@ -295,12 +280,13 @@ struct cgsolve {
             axpby(r, one, r, -alpha, Ap);
             num_iters = k;
         }
+	Kokkos::fence();
         return num_iters;
     }
 
 #if defined(KOKKOS_ENABLE_SYCL)
     template <class VType, class AType>
-    int cg_solve_sycl(VType y, AType A, VType b, int max_iter,
+    int cg_solve_sycl(VType solution, AType A, VType b, int max_iter,
                       double tolerance) {
         int myproc = 0;
         int num_iters = 0;
@@ -376,6 +362,7 @@ struct cgsolve {
             axpby_sycl(q, r, one, r, -alpha, Ap);
             num_iters = k;
         }
+	q.wait();
         return num_iters;
     }
 #endif
