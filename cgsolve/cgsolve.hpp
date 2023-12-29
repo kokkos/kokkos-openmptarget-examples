@@ -16,6 +16,14 @@
 
 #include <generate_matrix.hpp>
 
+#define USE_TPL
+
+#ifdef USE_TPL
+#include <KokkosSparse_spmv.hpp>
+#include <KokkosBlas.hpp>
+using INT_TYPE = int64_t;
+#endif
+
 /*
  * There is a bug in the clang OpenMP implementation wherein if the `dot`
  * routine is called with the same View as the 1st and 2nd parameter, the norm
@@ -55,6 +63,24 @@ struct cgsolve {
 	std::cout << "cgsolve end of constructor" << std::endl;
     }
 
+#ifdef USE_TPL
+    template <class YType, class AType, class XType>
+    void spmv(YType y, AType A, XType x) {
+      KokkosSparse::CrsMatrix<
+        double, INT_TYPE,
+        Kokkos::Device<Kokkos::DefaultExecutionSpace,
+                       typename Kokkos::DefaultExecutionSpace::memory_space>,
+        void, INT_TYPE>
+        matrix("A",           // const std::string& /* label */,
+               A.num_rows(),  // const OrdinalType nrows,
+               A.num_rows(),  // const OrdinalType ncols,
+               A.nnz(),       // const size_type annz,
+               A.values,      // const values_type& vals,
+               A.row_ptr,     // const row_map_type& rowmap,
+               A.col_idx);    // const index_type& cols)
+      KokkosSparse::spmv("N", 1.0, matrix, x, 0.0, y);
+    }
+#else
     template <class YType, class AType, class XType>
     void spmv(YType y, AType A, XType x) {
         int rows_per_team = 32; //10240 too large, 5120 OK
@@ -90,6 +116,7 @@ struct cgsolve {
                     });
             });
     }
+#endif
 
 #if defined(KOKKOS_ENABLE_SYCL)
     template <class YType, class AType, class XType>
