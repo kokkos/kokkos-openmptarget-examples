@@ -16,13 +16,13 @@
 
 #include <generate_matrix.hpp>
 
-#define USE_TPL
+//#define USE_TPL
 
 #ifdef USE_TPL
 #include <KokkosSparse_spmv.hpp>
 #include <KokkosBlas.hpp>
-using INT_TYPE = int64_t;
 #endif
+using INT_TYPE = int;
 
 /*
  * There is a bug in the clang OpenMP implementation wherein if the `dot`
@@ -45,8 +45,8 @@ struct cgsolve {
         Kokkos::View<double *, Kokkos::HostSpace> h_x =
             Impl::generate_miniFE_vector(N);
 
-        Kokkos::View<int64_t *> row_ptr("row_ptr", h_A.row_ptr.extent(0));
-        Kokkos::View<int64_t *> col_idx("col_idx", h_A.col_idx.extent(0));
+        Kokkos::View<INT_TYPE *> row_ptr("row_ptr", h_A.row_ptr.extent(0));
+        Kokkos::View<INT_TYPE *> col_idx("col_idx", h_A.col_idx.extent(0));
         Kokkos::View<double *> values("values", h_A.values.extent(0));
 	std::cout << "before CrsMatrix constructor" << std::endl;
         A = CrsMatrix<Kokkos::DefaultExecutionSpace::memory_space>(
@@ -86,28 +86,28 @@ struct cgsolve {
         int rows_per_team = 32; //10240 too large, 5120 OK
         int team_size = 16;
         int vector_size = 4;
-        int64_t nrows = y.extent(0);
+        INT_TYPE nrows = y.extent(0);
 	//std::cout << nrows << std::endl;
         Kokkos::parallel_for(
             "SPMV",
             Kokkos::TeamPolicy<>((nrows + rows_per_team - 1) / rows_per_team,
                                  team_size, vector_size),
             KOKKOS_LAMBDA(const Kokkos::TeamPolicy<>::member_type &team) {
-                const int64_t first_row = team.league_rank() * rows_per_team;
-                const int64_t last_row = first_row + rows_per_team < nrows
+                const INT_TYPE first_row = team.league_rank() * rows_per_team;
+                const INT_TYPE last_row = first_row + rows_per_team < nrows
                                              ? first_row + rows_per_team
                                              : nrows;
                 Kokkos::parallel_for(
                     Kokkos::TeamThreadRange(team, first_row, last_row),
-                    [&](const int64_t row) {
-                        const int64_t row_start = A.row_ptr(row);
-                        const int64_t row_length =
+                    [&](const INT_TYPE row) {
+                        const INT_TYPE row_start = A.row_ptr(row);
+                        const INT_TYPE row_length =
                             A.row_ptr(row + 1) - row_start;
 
                         double y_row;
                         Kokkos::parallel_reduce(
                             Kokkos::ThreadVectorRange(team, row_length),
-                            [=](const int64_t i, double &sum) {
+                            [=](const INT_TYPE i, double &sum) {
                                 sum += A.values(i + row_start) *
                                        x(A.col_idx(i + row_start));
                             },
@@ -123,7 +123,7 @@ struct cgsolve {
     void spmv_sycl(sycl::queue q, YType y, AType A, XType x) {
         int rows_per_team = 32;
         int team_size = 16;
-        int64_t nrows = y.extent(0);
+        INT_TYPE nrows = y.extent(0);
 
         auto row_ptr = A.row_ptr.data();
         auto values = A.values.data();
@@ -131,19 +131,19 @@ struct cgsolve {
         auto xp = x.data();
         auto yp = y.data();
 
-        int64_t n = (nrows + rows_per_team - 1) / rows_per_team;
+        INT_TYPE n = (nrows + rows_per_team - 1) / rows_per_team;
         q.submit([&] (sycl::handler& cgh) {
          cgh.parallel_for_work_group(sycl::range<1>(n), sycl::range<1>(team_size), [=](sycl::group<1> g) {
-	    const int64_t first_row = g.get_group_id(0) * rows_per_team;
-            const int64_t last_row = first_row + rows_per_team < nrows
+	    const INT_TYPE first_row = g.get_group_id(0) * rows_per_team;
+            const INT_TYPE last_row = first_row + rows_per_team < nrows
                                              ? first_row + rows_per_team
                                              : nrows;
 	    g.parallel_for_work_item(sycl::range<1>(last_row-first_row), [&](sycl::h_item<1> item) {
-              const int64_t row = item.get_local_id(0) + first_row;
-	      const int64_t row_start = row_ptr[row];
-              const int64_t row_length = row_ptr[row + 1] - row_start;
+              const INT_TYPE row = item.get_local_id(0) + first_row;
+	      const INT_TYPE row_start = row_ptr[row];
+              const INT_TYPE row_length = row_ptr[row + 1] - row_start;
               double y_row = 0.;
-              for (int64_t i = 0; i < row_length; ++i)
+              for (INT_TYPE i = 0; i < row_length; ++i)
                 y_row += values[i + row_start] * xp[col_idx[i + row_start]];
               yp[row] = y_row;
             });
@@ -157,7 +157,7 @@ struct cgsolve {
         double result;
         Kokkos::parallel_reduce(
             "DOT", y.extent(0),
-            KOKKOS_LAMBDA(const int64_t &i, double &lsum) {
+            KOKKOS_LAMBDA(const INT_TYPE &i, double &lsum) {
                 lsum += y(i) * x(i);
             },
             result);
@@ -198,7 +198,7 @@ struct cgsolve {
 
     template <class ZType, class YType, class XType>
     void axpby(ZType z, double alpha, XType x, double beta, YType y) {
-        int64_t n = z.extent(0);
+        INT_TYPE n = z.extent(0);
         Kokkos::parallel_for(
             "AXPBY", n,
             KOKKOS_LAMBDA(const int &i) { z(i) = alpha * x(i) + beta * y(i); });
@@ -208,7 +208,7 @@ struct cgsolve {
 #if defined(KOKKOS_ENABLE_SYCL)
     template <class ZType, class YType, class XType>
     void axpby_sycl(sycl::queue& q, ZType z, double alpha, XType x, double beta, YType y) {
-        int64_t n = z.extent(0);
+        INT_TYPE n = z.extent(0);
         auto xp = x.data();
         auto yp = y.data();
         auto zp = z.data();
@@ -242,7 +242,7 @@ struct cgsolve {
         double rtrans = 0;
         double oldrtrans = 0;
 
-        int64_t print_freq = max_iter / 10;
+        INT_TYPE print_freq = max_iter / 10;
         if (print_freq > 50) print_freq = 50;
         if (print_freq < 1) print_freq = 1;
         VType x("x", b.extent(0));
@@ -270,7 +270,7 @@ struct cgsolve {
 
         double brkdown_tol = std::numeric_limits<double>::epsilon();
 
-        for (int64_t k = 1; k <= max_iter && normr > tolerance; ++k) {
+        for (INT_TYPE k = 1; k <= max_iter && normr > tolerance; ++k) {
             if (k == 1) {
                 axpby(p, one, r, zero, r);
             } else {
@@ -324,7 +324,7 @@ struct cgsolve {
         double rtrans = 0;
         double oldrtrans = 0;
 
-        int64_t print_freq = max_iter / 10;
+        INT_TYPE print_freq = max_iter / 10;
         if (print_freq > 50) print_freq = 50;
         if (print_freq < 1) print_freq = 1;
         VType x("x", b.extent(0));
@@ -352,7 +352,7 @@ struct cgsolve {
 
         double brkdown_tol = std::numeric_limits<double>::epsilon();
 
-        for (int64_t k = 1; k <= max_iter && normr > tolerance; ++k) {
+        for (INT_TYPE k = 1; k <= max_iter && normr > tolerance; ++k) {
             if (k == 1) {
                 axpby_sycl(q, p, one, r, zero, r);
             } else {
@@ -401,7 +401,7 @@ struct cgsolve {
 
         // Compute Bytes and Flops
         double spmv_bytes =
-            A.num_rows() * sizeof(int64_t) + A.nnz() * sizeof(int64_t) +
+            A.num_rows() * sizeof(INT_TYPE) + A.nnz() * sizeof(INT_TYPE) +
             A.nnz() * sizeof(double) + A.nnz() * sizeof(double) +
             A.num_rows() * sizeof(double);
 
@@ -444,7 +444,7 @@ struct cgsolve {
 
         // Compute Bytes and Flops
         double spmv_bytes =
-            A.num_rows() * sizeof(int64_t) + A.nnz() * sizeof(int64_t) +
+            A.num_rows() * sizeof(INT_TYPE) + A.nnz() * sizeof(INT_TYPE) +
             A.nnz() * sizeof(double) + A.nnz() * sizeof(double) +
             A.num_rows() * sizeof(double);
 
