@@ -1,0 +1,3 @@
+/pscratch/sd/r/rgayatri/Kokkos/kokkos-openmptarget-examples/kernel-mode/1D/build/CMakeFiles/redn.dir
+/pscratch/sd/r/rgayatri/Kokkos/kokkos-openmptarget-examples/kernel-mode/1D/build/CMakeFiles/edit_cache.dir
+/pscratch/sd/r/rgayatri/Kokkos/kokkos-openmptarget-examples/kernel-mode/1D/build/CMakeFiles/rebuild_cache.dir
