@@ -18,7 +18,7 @@
 #include <cmath>
 #include <string.h>
 #include <ompx.h>
-
+#define ompx_shfl
 
 //#define check_correctness
 
@@ -191,9 +191,11 @@ struct omp_kernel_1d {
 
     const int nTeams = N_/nT + !! (N_%nT);
     size_t scratch_size = nT*sizeof(int64_t);
-    view_1d partial_results = view_1d("partial_results",nTeams);
-    /*int64_t* partial_results = static_cast<int64_t*>(omp_target_alloc(nTeams*sizeof(int64_t), omp_get_default_device()));*/
+    int64_t* partial_results = static_cast<int64_t*>(omp_target_alloc(nTeams*sizeof(int64_t), omp_get_default_device()));
 
+    auto lambda = [=](int i, int64_t& lsum){
+        lsum += vector(i);
+    };
 
     // warmup
 #pragma omp target teams ompx_bare num_teams(nTeams) thread_limit(nT) ompx_dyn_cgroup_mem(scratch_size) firstprivate(vector, partial_results)
@@ -208,51 +210,81 @@ struct omp_kernel_1d {
       const int i= blockidx*blockdimx+threadidx;
 
       if(i < N_)
-        buf[threadidx] += vector(i);
+        lambda(i, buf[threadidx]);
       ompx_sync_block_acq_rel();
 
       if(threadidx == 0)
       {
-        partial_results(blockidx) = 0;
+        partial_results[blockidx] = 0;
 
         for(int tid = 0; tid < blockdimx; ++tid)
-          partial_results(blockidx) += buf[tid];
+          partial_results[blockidx] += buf[tid];
       }
   }
     
     Kokkos::Timer timer;
-/*    for(int i = 0; i < 2; ++i)*/
-/*    {*/
-/*      result = 0;*/
-/**/
-/*#pragma omp target teams ompx_bare num_teams(nTeams) thread_limit(nT) ompx_dyn_cgroup_mem(scratch_size) firstprivate(partial_results)*/
-/*  {*/
-/*      const int blockIdx  = ompx::block_id(ompx::dim_x);*/
-/*      const int blockDimx = ompx::block_dim(ompx::dim_x);*/
-/*      const int threadIdx = ompx::thread_id(ompx::dim_x);*/
-/*      int64_t *buf = static_cast<int64_t*>(llvm_omp_target_dynamic_shared_alloc());*/
-/*      buf[threadIdx] = 0;*/
-/*      ompx_sync_block_acq_rel();*/
-/**/
-/*      const int i= blockIdx*blockDimx+threadIdx;*/
-/**/
-/*      if(i < N_)*/
-/*        buf[threadIdx] += vector(i);*/
-/*      ompx_sync_block_acq_rel();*/
-/**/
-/*      if(threadIdx == 0)*/
-/*      {*/
-/*        partial_results[blockIdx] = 0;*/
-/**/
-/*        for(int tid = 0; tid < blockDimx; ++tid)*/
-/*          partial_results[blockIdx] += buf[tid];*/
-/*      }*/
-/*  }*/
-/**/
-/*    auto h_partial_results = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace(), partial_results);*/
-/*    for(int i = 0; i < nTeams; ++i)*/
-/*      result += h_partial_results[i];*/
-/*    }*/
+    for(int i = 0; i < R; ++i)
+    {
+      result = 0;
+
+#pragma omp target teams ompx_bare num_teams(nTeams) thread_limit(nT) ompx_dyn_cgroup_mem(scratch_size) firstprivate(partial_results,vector)
+  {
+      const int blockIdx  = ompx::block_id(ompx::dim_x);
+      const int blockDimx = ompx::block_dim(ompx::dim_x);
+      const int threadIdx = ompx::thread_id(ompx::dim_x);
+      int64_t *buf = static_cast<int64_t*>(llvm_omp_target_dynamic_shared_alloc());
+      buf[threadIdx] = 0;
+      int64_t thread_update = 0;
+      const int warp_size = __kmpc_get_warp_size();
+
+      const int i= blockIdx*blockDimx+threadIdx;
+
+      if(i < N_)
+        lambda(i,buf[threadIdx]);
+      ompx_sync_block_acq_rel();
+
+#if defined(ompx_shfl)
+      thread_update = buf[threadIdx];
+      ompx_sync_block_acq_rel();
+
+      uint64_t mask = ompx::ballot_sync(__kmpc_warp_active_thread_mask(),threadIdx<N_);
+      for (int offset = warp_size / 2; offset > 0; offset /= 2)
+        thread_update += ompx::shfl_down_sync(mask, thread_update, offset);
+      ompx_sync_block_acq_rel();
+
+    if(threadIdx % warp_size == 0)
+      buf[threadIdx/warp_size] = thread_update;  
+
+    bool active_threads = (threadIdx < (blockDimx + warp_size -1) / warp_size) ;
+    ompx_sync_block_acq_rel();
+    if (active_threads)
+      thread_update = buf[threadIdx];
+    else
+      thread_update = 0;
+
+    mask = ompx::ballot_sync(__kmpc_warp_active_thread_mask(),active_threads);
+    for (int offset = warp_size / 2; offset > 0; offset /= 2)
+      thread_update += ompx::shfl_down_sync(mask, thread_update, offset);
+      ompx_sync_block_acq_rel();
+
+      if(threadIdx == 0)
+          partial_results[blockIdx] = thread_update;
+#else
+      if(threadIdx == 0)
+      {
+        partial_results[blockIdx] = 0;
+        for(int tid = 0; tid < blockDimx; ++tid)
+          partial_results[blockIdx] += buf[tid];
+      }
+#endif
+  }
+
+        int64_t* h_partial_results = static_cast<int64_t*>(omp_target_alloc(nTeams*sizeof(int64_t), omp_get_initial_device()));
+        omp_target_memcpy(h_partial_results, partial_results, nTeams*sizeof(int64_t), 0, 0, omp_get_initial_device(), omp_get_default_device());
+
+    for(int i = 0; i < nTeams; ++i)
+      result += h_partial_results[i];
+    }
 
 
     double time_taken = timer.seconds();

@@ -28,11 +28,6 @@ int main(int argc, char *argv[]) {
     printf("\n 1D parallelism\n");
     omp_kernel_1d par_1d(N);
     par_1d.run_test(R);
-
-    /*printf("\n Hierarchical parallelism\n");*/
-    /*omp_kernel_hierarchical par_hierarchical(N);*/
-    /*par_hierarchical.run_test(R);*/
-
   }
   Kokkos::finalize();
 }
